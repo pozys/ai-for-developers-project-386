@@ -45,13 +45,7 @@ export default function Layout({ children }: LayoutProps) {
               to="/admin/event-types"
               className={({ isActive }) => getNavLinkClassName(isActive)}
             >
-              Admin: типы событий
-            </NavLink>
-            <NavLink
-              to="/admin/bookings"
-              className={({ isActive }) => getNavLinkClassName(isActive)}
-            >
-              Admin: бронирования
+              Админка
             </NavLink>
           </div>
         </nav>

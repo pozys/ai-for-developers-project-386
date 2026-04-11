@@ -4,6 +4,7 @@ import {
   createRoutesFromElements,
 } from 'react-router'
 
+import AdminLayout from '@/components/AdminLayout'
 import Layout from '@/components/Layout'
 import BookingPage from '@/pages/BookingPage'
 import EventTypesPage from '@/pages/EventTypesPage'
@@ -26,10 +27,12 @@ const appRoutes = createRoutesFromElements(
   >
     <Route index element={<EventTypesPage />} />
     <Route path="event-types/:id/book" element={<BookingPage />} />
-    <Route path="admin/event-types" element={<AdminEventTypesPage />} />
-    <Route path="admin/event-types/new" element={<CreateEventTypePage />} />
-    <Route path="admin/event-types/:id/edit" element={<EditEventTypePage />} />
-    <Route path="admin/bookings" element={<BookingsPage />} />
+    <Route path="admin" element={<AdminLayout />}>
+      <Route path="event-types" element={<AdminEventTypesPage />} />
+      <Route path="event-types/new" element={<CreateEventTypePage />} />
+      <Route path="event-types/:id/edit" element={<EditEventTypePage />} />
+      <Route path="bookings" element={<BookingsPage />} />
+    </Route>
     <Route path="*" element={<NotFoundPage />} />
   </Route>,
 )

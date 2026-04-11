@@ -63,27 +63,18 @@ export default function AdminEventTypesPage() {
             Админ-панель
           </Badge>
           <div className="space-y-3">
-            <h1 className="text-4xl font-semibold tracking-tight">Admin: типы событий</h1>
+            <h1 className="text-4xl font-semibold tracking-tight">Типы событий</h1>
             <p className="max-w-2xl text-pretty text-lg text-muted-foreground">
               Управляйте доступными форматами встреч: создавайте новые карточки и обновляйте
               текущие настройки без выхода из админки.
             </p>
           </div>
         </div>
-        <Card className="border-border/70 bg-card/90">
-          <CardHeader className="space-y-2">
-            <CardTitle className="text-xl">Быстрые действия</CardTitle>
-            <CardDescription>Частые переходы в админке из одного места.</CardDescription>
-          </CardHeader>
-          <CardContent className="flex flex-col gap-3">
-            <Button type="button" variant="outline" className="h-11" onClick={() => navigate('/admin/bookings')}>
-              Открыть бронирования
-            </Button>
-            <Button type="button" className="h-11" onClick={() => navigate('/admin/event-types/new')}>
-              Новый тип события
-            </Button>
-          </CardContent>
-        </Card>
+        <div className="flex items-end">
+          <Button type="button" className="h-11" onClick={() => navigate('/admin/event-types/new')}>
+            Новый тип события
+          </Button>
+        </div>
       </section>
 
       {errorMessage ? (

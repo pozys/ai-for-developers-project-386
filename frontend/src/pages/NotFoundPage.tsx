@@ -38,7 +38,7 @@ export default function NotFoundPage() {
             className="h-11 w-full sm:flex-1"
             onClick={() => navigate('/admin/event-types')}
           >
-            В admin: типы событий
+            В админку
           </Button>
         </CardFooter>
       </Card>

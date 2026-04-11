@@ -18,8 +18,7 @@ describe('App', () => {
     renderApp()
 
     expect(screen.getByText('Home')).toBeInTheDocument()
-    expect(screen.getByText('Admin: типы событий')).toBeInTheDocument()
-    expect(screen.getByText('Admin: бронирования')).toBeInTheDocument()
+    expect(screen.getByText('Админка')).toBeInTheDocument()
     expect(await screen.findByText('Пока нет доступных слотов')).toBeInTheDocument()
   })
 

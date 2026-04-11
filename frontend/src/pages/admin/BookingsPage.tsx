@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react'
-import { useNavigate } from 'react-router'
 
 import { getAdminBookings } from '@/api/client'
 import type { Booking } from '@/types/api'
@@ -11,7 +10,6 @@ import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from '@/components/ui/card'
@@ -28,7 +26,6 @@ import {
 import { formatDateLabel, formatSlotRange } from '@/lib/date'
 
 export default function BookingsPage() {
-  const navigate = useNavigate()
   const [bookings, setBookings] = useState<Booking[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
@@ -73,24 +70,14 @@ export default function BookingsPage() {
             Админ-панель
           </Badge>
           <div className="space-y-3">
-            <h1 className="text-4xl font-semibold tracking-tight">Admin: бронирования</h1>
+            <h1 className="text-4xl font-semibold tracking-tight">Бронирования</h1>
             <p className="max-w-2xl text-pretty text-lg text-muted-foreground">
               Просматривайте предстоящие встречи с деталями по гостю, типу события и комментарию к
               записи.
             </p>
           </div>
         </div>
-        <Card className="border-border/70 bg-card/90">
-          <CardHeader className="space-y-2">
-            <CardTitle className="text-xl">Быстрый переход</CardTitle>
-            <CardDescription>Возврат к управлению типами событий.</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Button type="button" variant="outline" className="h-11 w-full" onClick={() => navigate('/admin/event-types')}>
-              Управлять типами событий
-            </Button>
-          </CardContent>
-        </Card>
+        <div />
       </section>
 
       {errorMessage ? (
@@ -130,11 +117,6 @@ export default function BookingsPage() {
               Новые записи появятся здесь сразу после успешного бронирования на публичной странице.
             </CardDescription>
           </CardHeader>
-          <CardFooter>
-            <Button type="button" variant="outline" className="h-11" onClick={() => navigate('/admin/event-types')}>
-              К типам событий
-            </Button>
-          </CardFooter>
         </Card>
       ) : null}
 
