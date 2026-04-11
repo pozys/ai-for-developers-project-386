@@ -11,3 +11,4 @@ node_modules/
 agent/
 
 CLAUDE.md
+.github/copilot-instructions.md
