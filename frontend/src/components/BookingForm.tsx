@@ -6,7 +6,9 @@ import { ApiError } from '@/api/errors'
 import type { Booking, EventType, TimeSlot } from '@/types/api'
 
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
+import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
@@ -104,94 +106,106 @@ export default function BookingForm({ eventType, slot, onBack, onSuccess }: Book
   }
 
   return (
-    <form className="space-y-5" noValidate onSubmit={handleSubmit}>
-      <div className="space-y-1">
-        <h2 className="text-xl font-semibold">Данные для бронирования</h2>
-        <p className="text-sm text-muted-foreground">
-          {eventType.name} · {formatDateLabel(slot.startTime.slice(0, 10))} · {formatSlotRange(slot.startTime, slot.endTime)}
-        </p>
-      </div>
+    <Card className="border-border/70 bg-card/90">
+      <CardHeader className="space-y-3">
+        <div className="flex flex-wrap items-center gap-2">
+          <Badge variant="secondary" className="bg-primary/10 text-primary">
+            Шаг 3
+          </Badge>
+          <Badge variant="outline">Имя, email и комментарий</Badge>
+        </div>
+        <CardTitle className="text-2xl">Данные для бронирования</CardTitle>
+        <CardDescription>
+          {eventType.name} · {formatDateLabel(slot.startTime.slice(0, 10))} ·{' '}
+          {formatSlotRange(slot.startTime, slot.endTime)}
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        <form className="space-y-5" noValidate onSubmit={handleSubmit}>
+          {submitError ? (
+            <Alert variant="destructive" aria-live="assertive">
+              <AlertTitle>Не удалось создать бронирование</AlertTitle>
+              <AlertDescription>{submitError}</AlertDescription>
+            </Alert>
+          ) : null}
 
-      {submitError ? (
-        <Alert variant="destructive" aria-live="assertive">
-          <AlertTitle>Не удалось создать бронирование</AlertTitle>
-          <AlertDescription>{submitError}</AlertDescription>
-        </Alert>
-      ) : null}
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div className="space-y-2">
+              <Label htmlFor="guestName">Имя</Label>
+              <Input
+                id="guestName"
+                name="guestName"
+                value={guestName}
+                required
+                aria-invalid={fieldErrors.guestName ? true : undefined}
+                aria-describedby={fieldErrors.guestName ? 'guestName-error' : undefined}
+                onChange={(event) => {
+                  setGuestName(event.target.value)
+                  clearFieldError('guestName')
+                }}
+              />
+              {fieldErrors.guestName ? (
+                <p id="guestName-error" className="text-sm text-destructive">
+                  {fieldErrors.guestName}
+                </p>
+              ) : null}
+            </div>
 
-      <div className="space-y-2">
-        <Label htmlFor="guestName">Имя</Label>
-        <Input
-          id="guestName"
-          name="guestName"
-          value={guestName}
-          required
-          aria-invalid={fieldErrors.guestName ? true : undefined}
-          aria-describedby={fieldErrors.guestName ? 'guestName-error' : undefined}
-          onChange={(event) => {
-            setGuestName(event.target.value)
-            clearFieldError('guestName')
-          }}
-        />
-        {fieldErrors.guestName ? (
-          <p id="guestName-error" className="text-sm text-destructive">
-            {fieldErrors.guestName}
-          </p>
-        ) : null}
-      </div>
+            <div className="space-y-2">
+              <Label htmlFor="guestEmail">Email</Label>
+              <Input
+                id="guestEmail"
+                name="guestEmail"
+                type="email"
+                inputMode="email"
+                value={guestEmail}
+                required
+                aria-invalid={fieldErrors.guestEmail ? true : undefined}
+                aria-describedby={fieldErrors.guestEmail ? 'guestEmail-error' : undefined}
+                onChange={(event) => {
+                  setGuestEmail(event.target.value)
+                  clearFieldError('guestEmail')
+                }}
+              />
+              {fieldErrors.guestEmail ? (
+                <p id="guestEmail-error" className="text-sm text-destructive">
+                  {fieldErrors.guestEmail}
+                </p>
+              ) : null}
+            </div>
+          </div>
 
-      <div className="space-y-2">
-        <Label htmlFor="guestEmail">Email</Label>
-        <Input
-          id="guestEmail"
-          name="guestEmail"
-          type="email"
-          inputMode="email"
-          value={guestEmail}
-          required
-          aria-invalid={fieldErrors.guestEmail ? true : undefined}
-          aria-describedby={fieldErrors.guestEmail ? 'guestEmail-error' : undefined}
-          onChange={(event) => {
-            setGuestEmail(event.target.value)
-            clearFieldError('guestEmail')
-          }}
-        />
-        {fieldErrors.guestEmail ? (
-          <p id="guestEmail-error" className="text-sm text-destructive">
-            {fieldErrors.guestEmail}
-          </p>
-        ) : null}
-      </div>
+          <div className="space-y-2">
+            <Label htmlFor="comment">Комментарий</Label>
+            <Textarea
+              id="comment"
+              name="comment"
+              value={comment}
+              placeholder="Если есть детали, напишите их здесь"
+              aria-invalid={fieldErrors.comment ? true : undefined}
+              aria-describedby={fieldErrors.comment ? 'comment-error' : undefined}
+              onChange={(event) => {
+                setComment(event.target.value)
+                clearFieldError('comment')
+              }}
+            />
+            {fieldErrors.comment ? (
+              <p id="comment-error" className="text-sm text-destructive">
+                {fieldErrors.comment}
+              </p>
+            ) : null}
+          </div>
 
-      <div className="space-y-2">
-        <Label htmlFor="comment">Комментарий</Label>
-        <Textarea
-          id="comment"
-          name="comment"
-          value={comment}
-          placeholder="Если есть детали, напишите их здесь"
-          aria-invalid={fieldErrors.comment ? true : undefined}
-          aria-describedby={fieldErrors.comment ? 'comment-error' : undefined}
-          onChange={(event) => {
-            setComment(event.target.value)
-            clearFieldError('comment')
-          }}
-        />
-        {fieldErrors.comment ? (
-          <p id="comment-error" className="text-sm text-destructive">
-            {fieldErrors.comment}
-          </p>
-        ) : null}
-      </div>
-
-      <div className="flex flex-col gap-3 sm:flex-row">
-        <Button type="submit" className="sm:flex-1" disabled={isSubmitting}>
-          {isSubmitting ? 'Сохраняем...' : 'Подтвердить запись'}
-        </Button>
-        <Button type="button" variant="outline" className="sm:flex-1" onClick={onBack}>
-          Выбрать другой слот
-        </Button>
-      </div>
-    </form>
+          <div className="flex flex-col gap-3 sm:flex-row">
+            <Button type="submit" className="h-11 sm:flex-1" disabled={isSubmitting}>
+              {isSubmitting ? 'Сохраняем...' : 'Подтвердить запись'}
+            </Button>
+            <Button type="button" variant="outline" className="h-11 sm:flex-1" onClick={onBack}>
+              Выбрать другой слот
+            </Button>
+          </div>
+        </form>
+      </CardContent>
+    </Card>
   )
 }

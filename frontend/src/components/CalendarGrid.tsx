@@ -36,7 +36,9 @@ export default function CalendarGrid({
     <section aria-labelledby="calendar-grid-heading" className="space-y-4">
       <div className="flex items-center justify-between gap-3">
         <div>
-          <h2 id="calendar-grid-heading" className="text-lg font-semibold">Выберите дату</h2>
+          <h2 id="calendar-grid-heading" className="text-lg font-semibold tracking-tight">
+            Выберите дату
+          </h2>
           <p className="text-sm text-muted-foreground">
             Доступны только будни в пределах 14 дней.
           </p>
@@ -65,9 +67,9 @@ export default function CalendarGrid({
         </div>
       </div>
 
-      <div className="rounded-xl border bg-card p-4 text-card-foreground">
+      <div className="rounded-2xl border border-border/70 bg-card/90 p-4 text-card-foreground shadow-[0_20px_50px_-30px_rgba(15,23,42,0.35)] backdrop-blur">
         <p
-          className="mb-4 text-center text-sm font-medium capitalize"
+          className="mb-4 text-center text-base font-heading font-medium capitalize tracking-tight"
           role="heading"
           aria-level={3}
           aria-live="polite"
@@ -75,7 +77,7 @@ export default function CalendarGrid({
           {formatMonthLabel(displayedMonth)}
         </p>
 
-        <div className="mb-2 grid grid-cols-7 gap-2 text-center text-xs text-muted-foreground">
+        <div className="mb-2 grid grid-cols-7 gap-2 text-center text-[11px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
           {getWeekdayLabels().map((label) => (
             <span key={label}>{label}</span>
           ))}
@@ -90,7 +92,7 @@ export default function CalendarGrid({
                 key={day.dateKey}
                 type="button"
                 variant={isSelected ? 'default' : 'ghost'}
-                className="h-10 w-full rounded-lg px-0"
+                className="h-11 w-full rounded-xl px-0 text-sm"
                 aria-label={formatCalendarDayLabel(day.dateKey)}
                 aria-pressed={isSelected}
                 disabled={!day.isSelectable}

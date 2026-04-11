@@ -2,6 +2,7 @@ import type { TimeSlot } from '@/types/api'
 
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
 import { Skeleton } from '@/components/ui/skeleton'
 import { formatDateLabel, formatSlotRange } from '@/lib/date'
 
@@ -29,11 +30,22 @@ export default function TimeSlotList({
   return (
     <section
       aria-labelledby="time-slot-list-heading"
-      className="space-y-4 rounded-xl border bg-card p-4 text-card-foreground"
+      className="space-y-4 rounded-2xl border border-border/70 bg-card/90 p-4 text-card-foreground shadow-[0_20px_50px_-30px_rgba(15,23,42,0.35)] backdrop-blur"
     >
-      <div>
-        <h2 id="time-slot-list-heading" className="text-lg font-semibold">Свободное время</h2>
-        <p className="text-sm text-muted-foreground capitalize">{formatDateLabel(selectedDate)}</p>
+      <div className="flex items-start justify-between gap-3">
+        <div>
+          <h2 id="time-slot-list-heading" className="text-lg font-semibold tracking-tight">
+            Свободное время
+          </h2>
+          <p className="text-sm text-muted-foreground capitalize">
+            {formatDateLabel(selectedDate)}
+          </p>
+        </div>
+        {slots.length > 0 ? (
+          <Badge variant="outline" className="bg-muted/40">
+            {availableSlots.length} / {slots.length}
+          </Badge>
+        ) : null}
       </div>
 
       {errorMessage ? (
@@ -53,7 +65,7 @@ export default function TimeSlotList({
       {isLoading ? (
         <div className="space-y-2">
           {Array.from({ length: 5 }, (_, index) => (
-            <Skeleton key={index} className="h-10 w-full rounded-lg" />
+            <Skeleton key={index} className="h-11 w-full rounded-xl" />
           ))}
         </div>
       ) : null}
@@ -78,7 +90,7 @@ export default function TimeSlotList({
                   key={slot.startTime}
                   type="button"
                   variant={isSelected ? 'default' : 'outline'}
-                  className="w-full justify-between"
+                  className="h-11 w-full justify-between rounded-xl px-4"
                   aria-label={slot.available ? `Выбрать слот ${slotRange}` : `Слот занят ${slotRange}`}
                   aria-pressed={slot.available ? isSelected : undefined}
                   disabled={!slot.available}

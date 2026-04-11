@@ -5,6 +5,7 @@ import { ApiError } from '@/api/errors'
 import type { CreateEventTypeRequest } from '@/types/api'
 
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
+import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
@@ -166,8 +167,11 @@ export default function EventTypeForm({
   }
 
   return (
-    <Card className="mx-auto max-w-2xl">
+    <Card className="mx-auto max-w-2xl border-border/70 bg-card/90">
       <CardHeader className="space-y-3">
+        <Badge variant="secondary" className="w-fit bg-primary/10 text-primary">
+          Настройки события
+        </Badge>
         <h1 className="text-2xl font-semibold tracking-tight">{title}</h1>
         <CardDescription>{description}</CardDescription>
       </CardHeader>

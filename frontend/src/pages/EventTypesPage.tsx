@@ -57,11 +57,46 @@ export default function EventTypesPage() {
 
   return (
     <div className="space-y-8" aria-busy={isLoading}>
-      <section className="space-y-3">
-        <h1 className="text-3xl font-semibold tracking-tight">Типы событий</h1>
-        <p className="max-w-2xl text-muted-foreground">
-          Выберите формат звонка, а затем удобную дату и свободный слот в календаре.
-        </p>
+      <section className="grid gap-6 lg:grid-cols-[minmax(0,1.2fr)_minmax(280px,0.8fr)] lg:items-end">
+        <div className="space-y-4">
+          <div className="flex flex-wrap gap-2">
+            <Badge variant="secondary" className="bg-primary/10 text-primary">
+              Публичная запись
+            </Badge>
+            <Badge variant="outline">Без регистрации</Badge>
+            <Badge variant="outline">14 дней вперёд</Badge>
+          </div>
+          <div className="space-y-3">
+            <h1 className="max-w-2xl text-4xl font-semibold tracking-tight sm:text-5xl">
+              Типы событий
+            </h1>
+            <p className="max-w-2xl text-pretty text-lg text-muted-foreground">
+              Выберите формат звонка, затем удобную дату и свободный слот в календаре. Вся запись
+              занимает несколько кликов и не требует регистрации.
+            </p>
+          </div>
+        </div>
+
+        <Card className="border-border/70 bg-card/90">
+          <CardHeader className="space-y-2">
+            <CardTitle className="text-xl">Как это работает</CardTitle>
+            <CardDescription>Ориентир для гостей перед выбором конкретного формата.</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-3 text-sm text-muted-foreground">
+            <div className="flex items-center justify-between gap-4">
+              <span>Рабочие дни</span>
+              <span className="font-medium text-foreground">Пн - Пт</span>
+            </div>
+            <div className="flex items-center justify-between gap-4">
+              <span>Время</span>
+              <span className="font-medium text-foreground">09:00 - 17:00</span>
+            </div>
+            <div className="flex items-center justify-between gap-4">
+              <span>Часовой пояс</span>
+              <span className="font-medium text-foreground">Europe/Moscow</span>
+            </div>
+          </CardContent>
+        </Card>
       </section>
 
       {errorMessage ? (
@@ -80,16 +115,17 @@ export default function EventTypesPage() {
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
           {Array.from({ length: 3 }, (_, index) => (
             <Card key={index}>
-              <CardHeader>
-                <Skeleton className="h-5 w-32" />
+              <CardHeader className="space-y-3">
+                <Skeleton className="h-4 w-28 rounded-full" />
+                <Skeleton className="h-6 w-36" />
                 <Skeleton className="h-4 w-full" />
               </CardHeader>
               <CardContent className="space-y-3">
                 <Skeleton className="h-4 w-full" />
-                <Skeleton className="h-4 w-3/4" />
+                <Skeleton className="h-4 w-2/3" />
               </CardContent>
               <CardFooter>
-                <Skeleton className="h-8 w-full" />
+                <Skeleton className="h-11 w-full rounded-xl" />
               </CardFooter>
             </Card>
           ))}
@@ -97,9 +133,12 @@ export default function EventTypesPage() {
       ) : null}
 
       {!isLoading && !errorMessage && eventTypes.length === 0 ? (
-        <Card>
-          <CardHeader>
-            <CardTitle>Пока нет доступных слотов</CardTitle>
+        <Card className="border-border/70 bg-card/90">
+          <CardHeader className="space-y-3">
+            <Badge variant="secondary" className="w-fit bg-primary/10 text-primary">
+              Пустой список
+            </Badge>
+            <CardTitle className="text-2xl">Пока нет доступных слотов</CardTitle>
             <CardDescription>
               Когда владелец календаря добавит типы событий, они появятся на этой странице.
             </CardDescription>
@@ -110,21 +149,24 @@ export default function EventTypesPage() {
       {!isLoading && !errorMessage && eventTypes.length > 0 ? (
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
           {eventTypes.map((eventType) => (
-            <Card key={eventType.id} className="h-full">
+            <Card key={eventType.id} className="h-full transition-transform duration-200 hover:-translate-y-0.5">
               <CardHeader className="space-y-3">
                 <div className="flex items-start justify-between gap-3">
-                  <CardTitle>{eventType.name}</CardTitle>
-                  <Badge variant="secondary">{eventType.durationMinutes} мин</Badge>
+                  <CardTitle className="text-2xl">{eventType.name}</CardTitle>
+                  <Badge variant="secondary" className="bg-primary/10 text-primary">
+                    {eventType.durationMinutes} мин
+                  </Badge>
                 </div>
-                <CardDescription>{eventType.description}</CardDescription>
+                <CardDescription className="text-pretty">{eventType.description}</CardDescription>
               </CardHeader>
-              <CardContent className="text-sm text-muted-foreground">
-                Доступно для бронирования в ближайшие 14 дней по рабочим дням.
+              <CardContent className="space-y-2 text-sm text-muted-foreground">
+                <p>Доступно для бронирования в ближайшие 14 дней по рабочим дням.</p>
+                <p>Подходит для гостя, который хочет быстро выбрать формат встречи.</p>
               </CardContent>
               <CardFooter>
                 <Button
                   type="button"
-                  className="w-full"
+                  className="h-11 w-full"
                   onClick={() => navigate(`/event-types/${eventType.id}/book`)}
                 >
                   Выбрать время

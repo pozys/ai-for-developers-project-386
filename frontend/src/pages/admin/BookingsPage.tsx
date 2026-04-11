@@ -5,6 +5,7 @@ import { getAdminBookings } from '@/api/client'
 import type { Booking } from '@/types/api'
 
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
+import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import {
   Card,
@@ -66,17 +67,30 @@ export default function BookingsPage() {
 
   return (
     <div className="space-y-8" aria-busy={isLoading}>
-      <section className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
-        <div className="space-y-3">
-          <h1 className="text-3xl font-semibold tracking-tight">Admin: бронирования</h1>
-          <p className="max-w-2xl text-muted-foreground">
-            Просматривайте предстоящие встречи с деталями по гостю, типу события и комментарию к
-            записи.
-          </p>
+      <section className="grid gap-6 lg:grid-cols-[minmax(0,1.2fr)_minmax(280px,0.8fr)] lg:items-end">
+        <div className="space-y-4">
+          <Badge variant="secondary" className="w-fit bg-primary/10 text-primary">
+            Админ-панель
+          </Badge>
+          <div className="space-y-3">
+            <h1 className="text-4xl font-semibold tracking-tight">Admin: бронирования</h1>
+            <p className="max-w-2xl text-pretty text-lg text-muted-foreground">
+              Просматривайте предстоящие встречи с деталями по гостю, типу события и комментарию к
+              записи.
+            </p>
+          </div>
         </div>
-        <Button type="button" variant="outline" onClick={() => navigate('/admin/event-types')}>
-          Управлять типами событий
-        </Button>
+        <Card className="border-border/70 bg-card/90">
+          <CardHeader className="space-y-2">
+            <CardTitle className="text-xl">Быстрый переход</CardTitle>
+            <CardDescription>Возврат к управлению типами событий.</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Button type="button" variant="outline" className="h-11 w-full" onClick={() => navigate('/admin/event-types')}>
+              Управлять типами событий
+            </Button>
+          </CardContent>
+        </Card>
       </section>
 
       {errorMessage ? (
@@ -92,7 +106,7 @@ export default function BookingsPage() {
       ) : null}
 
       {isLoading ? (
-        <Card>
+        <Card className="border-border/70 bg-card/90">
           <CardHeader>
             <Skeleton className="h-5 w-40" />
             <Skeleton className="h-4 w-64" />
@@ -106,15 +120,18 @@ export default function BookingsPage() {
       ) : null}
 
       {!isLoading && !errorMessage && bookings.length === 0 ? (
-        <Card>
-          <CardHeader>
-            <CardTitle>Пока нет предстоящих встреч</CardTitle>
+        <Card className="border-border/70 bg-card/90">
+          <CardHeader className="space-y-3">
+            <Badge variant="secondary" className="w-fit bg-primary/10 text-primary">
+              Пустой список
+            </Badge>
+            <CardTitle className="text-2xl">Пока нет предстоящих встреч</CardTitle>
             <CardDescription>
               Новые записи появятся здесь сразу после успешного бронирования на публичной странице.
             </CardDescription>
           </CardHeader>
           <CardFooter>
-            <Button type="button" variant="outline" onClick={() => navigate('/admin/event-types')}>
+            <Button type="button" variant="outline" className="h-11" onClick={() => navigate('/admin/event-types')}>
               К типам событий
             </Button>
           </CardFooter>
@@ -122,10 +139,17 @@ export default function BookingsPage() {
       ) : null}
 
       {!isLoading && !errorMessage && bookings.length > 0 ? (
-        <Card>
-          <CardHeader>
-            <CardTitle>Предстоящие встречи</CardTitle>
-            <CardDescription>Все бронирования отображаются по московскому времени.</CardDescription>
+        <Card className="border-border/70 bg-card/90">
+          <CardHeader className="space-y-3">
+            <div className="flex items-start justify-between gap-3">
+              <div className="space-y-1">
+                <CardTitle className="text-2xl">Предстоящие встречи</CardTitle>
+                <CardDescription>Все бронирования отображаются по московскому времени.</CardDescription>
+              </div>
+              <Badge variant="outline" className="bg-muted/40">
+                {bookings.length}
+              </Badge>
+            </div>
           </CardHeader>
           <CardContent>
             <Table>

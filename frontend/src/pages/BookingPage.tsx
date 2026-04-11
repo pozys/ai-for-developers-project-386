@@ -40,6 +40,11 @@ export default function BookingPage() {
   const [confirmedBooking, setConfirmedBooking] = useState<Booking | null>(null)
   const [eventTypeRequestKey, setEventTypeRequestKey] = useState(0)
   const [slotsRequestKey, setSlotsRequestKey] = useState(0)
+  const stepItems = [
+    { key: 'select', label: 'Дата и слот' },
+    { key: 'form', label: 'Контакты' },
+    { key: 'confirmed', label: 'Подтверждение' },
+  ] as const
 
   useEffect(() => {
     let isMounted = true
@@ -154,16 +159,18 @@ export default function BookingPage() {
   if (isEventTypeLoading) {
     return (
       <div className="space-y-6" aria-busy="true">
-        <section className="space-y-3">
-          <h1 className="text-3xl font-semibold tracking-tight">Бронирование</h1>
-          <p className="max-w-2xl text-muted-foreground">
-            Загружаем тип события, доступные даты и свободные интервалы по московскому времени.
-          </p>
+        <section className="space-y-4">
+          <div className="flex flex-wrap gap-2">
+            <Skeleton className="h-6 w-28 rounded-full" />
+            <Skeleton className="h-6 w-24 rounded-full" />
+          </div>
+          <Skeleton className="h-12 w-full max-w-xl" />
+          <Skeleton className="h-7 w-full max-w-2xl" />
         </section>
-        <Skeleton className="h-24 w-full rounded-xl" />
-        <div className="grid gap-6 lg:grid-cols-[minmax(0,1.2fr)_minmax(320px,0.8fr)]">
-          <Skeleton className="h-[420px] w-full rounded-xl" />
-          <Skeleton className="h-[420px] w-full rounded-xl" />
+        <Skeleton className="h-28 w-full rounded-2xl" />
+        <div className="grid gap-6 lg:grid-cols-[minmax(0,1.15fr)_minmax(320px,0.85fr)]">
+          <Skeleton className="h-[460px] w-full rounded-2xl" />
+          <Skeleton className="h-[460px] w-full rounded-2xl" />
         </div>
       </div>
     )
@@ -173,7 +180,7 @@ export default function BookingPage() {
     return (
       <div className="space-y-6">
         <section className="space-y-3">
-          <h1 className="text-3xl font-semibold tracking-tight">Бронирование</h1>
+          <h1 className="text-4xl font-semibold tracking-tight">Бронирование</h1>
           <p className="max-w-2xl text-muted-foreground">
             Страница не смогла загрузить выбранный тип события.
           </p>
@@ -201,16 +208,18 @@ export default function BookingPage() {
   if (step === 'confirmed' && confirmedBooking) {
     return (
       <div className="mx-auto max-w-2xl space-y-6">
-        <section className="space-y-3">
-          <h1 className="text-3xl font-semibold tracking-tight">Запись подтверждена</h1>
+        <section className="space-y-4">
+          <Badge variant="secondary" className="w-fit bg-primary/10 text-primary">
+            Успешно
+          </Badge>
+          <h1 className="text-4xl font-semibold tracking-tight">Запись подтверждена</h1>
           <p className="text-muted-foreground">
             Подтверждение сохранено, а слот больше не доступен для повторного бронирования.
           </p>
         </section>
 
-        <Card>
+        <Card className="border-border/70 bg-card/90">
           <CardHeader className="space-y-3">
-            <Badge variant="secondary" className="w-fit">Успешно</Badge>
             <CardTitle className="text-2xl">Детали бронирования</CardTitle>
             <CardDescription>
               Мы сохранили ваше бронирование и зарезервировали выбранное время.
@@ -272,11 +281,55 @@ export default function BookingPage() {
 
   return (
     <div className="space-y-6">
-      <section className="space-y-3">
-        <h1 className="text-3xl font-semibold tracking-tight">Бронирование</h1>
-        <p className="max-w-2xl text-muted-foreground">
-          Выберите рабочий день в ближайшие 14 дней, свободный слот и заполните контактные данные.
-        </p>
+      <section className="grid gap-6 lg:grid-cols-[minmax(0,1.2fr)_minmax(320px,0.8fr)] lg:items-end">
+        <div className="space-y-4">
+          <div className="flex flex-wrap gap-2">
+            {stepItems.map((item, index) => {
+              const isActive =
+                (step === 'select' && item.key === 'select')
+                || (step === 'form' && item.key === 'form')
+                || (step === 'confirmed' && item.key === 'confirmed')
+
+              return (
+                <Badge
+                  key={item.key}
+                  variant={isActive ? 'secondary' : 'outline'}
+                  className={isActive ? 'bg-primary/10 text-primary' : ''}
+                >
+                  {index + 1}. {item.label}
+                </Badge>
+              )
+            })}
+          </div>
+          <div className="space-y-3">
+            <h1 className="text-4xl font-semibold tracking-tight">Бронирование</h1>
+            <p className="max-w-2xl text-pretty text-lg text-muted-foreground">
+              Выберите рабочий день в ближайшие 14 дней, свободный слот и заполните контактные
+              данные.
+            </p>
+          </div>
+        </div>
+
+        <Card className="border-border/70 bg-card/90">
+          <CardHeader className="space-y-2">
+            <CardTitle className="text-xl">{eventType.name}</CardTitle>
+            <CardDescription>{eventType.description}</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-3 text-sm text-muted-foreground">
+            <div className="flex items-center justify-between gap-4">
+              <span>Длительность</span>
+              <span className="font-medium text-foreground">{eventType.durationMinutes} мин</span>
+            </div>
+            <div className="flex items-center justify-between gap-4">
+              <span>Окно записи</span>
+              <span className="font-medium text-foreground">14 дней</span>
+            </div>
+            <div className="flex items-center justify-between gap-4">
+              <span>Рабочие часы</span>
+              <span className="font-medium text-foreground">09:00 - 17:00</span>
+            </div>
+          </CardContent>
+        </Card>
       </section>
 
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
@@ -287,23 +340,37 @@ export default function BookingPage() {
         </div>
       </div>
 
-      <Card>
+      <Card className="border-border/70 bg-card/90">
         <CardHeader className="space-y-3">
           <div className="flex flex-wrap items-start justify-between gap-3">
             <div className="space-y-1">
-              <CardTitle className="text-2xl">{eventType.name}</CardTitle>
-              <CardDescription>{eventType.description}</CardDescription>
+              <CardTitle className="text-xl">Сейчас выбрано</CardTitle>
+              <CardDescription>
+                Выбор обновляется по мере перехода между датами и слотами.
+              </CardDescription>
             </div>
-            <Badge variant="secondary">{eventType.durationMinutes} мин</Badge>
+            <Badge variant="secondary" className="bg-primary/10 text-primary">
+              {eventType.durationMinutes} мин
+            </Badge>
           </div>
         </CardHeader>
-        <CardContent className="space-y-4 text-sm">
-          <p className="text-muted-foreground">
-            Рабочие дни: понедельник - пятница, 09:00 - 17:00 (Europe/Moscow).
-          </p>
-          <p className="text-muted-foreground capitalize">
-            Выбранная дата: <span className="font-medium text-foreground">{formatDateLabel(selectedDate)}</span>
-          </p>
+        <CardContent className="grid gap-4 text-sm sm:grid-cols-2">
+          <div className="rounded-xl border border-border/70 bg-muted/30 p-3">
+            <p className="text-muted-foreground">Длительность</p>
+            <p className="font-medium text-foreground">{eventType.durationMinutes} мин</p>
+          </div>
+          <div className="rounded-xl border border-border/70 bg-muted/30 p-3">
+            <p className="text-muted-foreground">Выбранная дата</p>
+            <p className="font-medium text-foreground">{formatDateLabel(selectedDate)}</p>
+          </div>
+          <div className="rounded-xl border border-border/70 bg-muted/30 p-3">
+            <p className="text-muted-foreground">Рабочие дни</p>
+            <p className="font-medium text-foreground">Понедельник - пятница</p>
+          </div>
+          <div className="rounded-xl border border-border/70 bg-muted/30 p-3">
+            <p className="text-muted-foreground">Часовой пояс</p>
+            <p className="font-medium text-foreground">Europe/Moscow</p>
+          </div>
         </CardContent>
       </Card>
 

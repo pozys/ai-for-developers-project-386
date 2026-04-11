@@ -57,22 +57,33 @@ export default function AdminEventTypesPage() {
 
   return (
     <div className="space-y-8" aria-busy={isLoading}>
-      <section className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
-        <div className="space-y-3">
-          <h1 className="text-3xl font-semibold tracking-tight">Admin: типы событий</h1>
-          <p className="max-w-2xl text-muted-foreground">
-            Управляйте доступными форматами встреч: создавайте новые карточки и обновляйте текущие
-            настройки без выхода из админки.
-          </p>
+      <section className="grid gap-6 lg:grid-cols-[minmax(0,1.2fr)_minmax(280px,0.8fr)] lg:items-end">
+        <div className="space-y-4">
+          <Badge variant="secondary" className="w-fit bg-primary/10 text-primary">
+            Админ-панель
+          </Badge>
+          <div className="space-y-3">
+            <h1 className="text-4xl font-semibold tracking-tight">Admin: типы событий</h1>
+            <p className="max-w-2xl text-pretty text-lg text-muted-foreground">
+              Управляйте доступными форматами встреч: создавайте новые карточки и обновляйте
+              текущие настройки без выхода из админки.
+            </p>
+          </div>
         </div>
-        <div className="flex flex-col gap-3 sm:flex-row">
-          <Button type="button" variant="outline" onClick={() => navigate('/admin/bookings')}>
-            Открыть бронирования
-          </Button>
-          <Button type="button" onClick={() => navigate('/admin/event-types/new')}>
-            Новый тип события
-          </Button>
-        </div>
+        <Card className="border-border/70 bg-card/90">
+          <CardHeader className="space-y-2">
+            <CardTitle className="text-xl">Быстрые действия</CardTitle>
+            <CardDescription>Частые переходы в админке из одного места.</CardDescription>
+          </CardHeader>
+          <CardContent className="flex flex-col gap-3">
+            <Button type="button" variant="outline" className="h-11" onClick={() => navigate('/admin/bookings')}>
+              Открыть бронирования
+            </Button>
+            <Button type="button" className="h-11" onClick={() => navigate('/admin/event-types/new')}>
+              Новый тип события
+            </Button>
+          </CardContent>
+        </Card>
       </section>
 
       {errorMessage ? (
@@ -91,7 +102,8 @@ export default function AdminEventTypesPage() {
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
           {Array.from({ length: 3 }, (_, index) => (
             <Card key={index}>
-              <CardHeader>
+              <CardHeader className="space-y-3">
+                <Skeleton className="h-4 w-28 rounded-full" />
                 <Skeleton className="h-5 w-40" />
                 <Skeleton className="h-4 w-full" />
               </CardHeader>
@@ -100,7 +112,7 @@ export default function AdminEventTypesPage() {
                 <Skeleton className="h-4 w-2/3" />
               </CardContent>
               <CardFooter>
-                <Skeleton className="h-8 w-full" />
+                <Skeleton className="h-11 w-full rounded-xl" />
               </CardFooter>
             </Card>
           ))}
@@ -108,15 +120,18 @@ export default function AdminEventTypesPage() {
       ) : null}
 
       {!isLoading && !errorMessage && eventTypes.length === 0 ? (
-        <Card>
-          <CardHeader>
-            <CardTitle>Пока нет типов событий</CardTitle>
+        <Card className="border-border/70 bg-card/90">
+          <CardHeader className="space-y-3">
+            <Badge variant="secondary" className="w-fit bg-primary/10 text-primary">
+              Пустой список
+            </Badge>
+            <CardTitle className="text-2xl">Пока нет типов событий</CardTitle>
             <CardDescription>
               Создайте первый тип события, чтобы он появился на публичной странице бронирования.
             </CardDescription>
           </CardHeader>
           <CardFooter>
-            <Button type="button" onClick={() => navigate('/admin/event-types/new')}>
+            <Button type="button" className="h-11" onClick={() => navigate('/admin/event-types/new')}>
               Создать тип события
             </Button>
           </CardFooter>
@@ -126,21 +141,25 @@ export default function AdminEventTypesPage() {
       {!isLoading && !errorMessage && eventTypes.length > 0 ? (
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
           {eventTypes.map((eventType) => (
-            <Card key={eventType.id} className="h-full">
+            <Card key={eventType.id} className="h-full transition-transform duration-200 hover:-translate-y-0.5">
               <CardHeader className="space-y-3">
                 <div className="flex items-start justify-between gap-3">
-                  <CardTitle>{eventType.name}</CardTitle>
-                  <Badge variant="secondary">{eventType.durationMinutes} мин</Badge>
+                  <CardTitle className="text-2xl">{eventType.name}</CardTitle>
+                  <Badge variant="secondary" className="bg-primary/10 text-primary">
+                    {eventType.durationMinutes} мин
+                  </Badge>
                 </div>
-                <CardDescription>{eventType.description}</CardDescription>
+                <CardDescription className="text-pretty">{eventType.description}</CardDescription>
               </CardHeader>
-              <CardContent className="text-sm text-muted-foreground">
-                Идентификатор типа события: {eventType.id}
+              <CardContent className="space-y-2 text-sm text-muted-foreground">
+                <p>Идентификатор типа события: {eventType.id}</p>
+                <p>Используется в публичной странице и в форме создания бронирования.</p>
               </CardContent>
               <CardFooter className="justify-end">
                 <Button
                   type="button"
                   variant="outline"
+                  className="h-11"
                   onClick={() => navigate(`/admin/event-types/${eventType.id}/edit`)}
                 >
                   Редактировать
