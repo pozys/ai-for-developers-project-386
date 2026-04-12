@@ -59,12 +59,20 @@
             "cache:clear": "symfony-cmd",
             "assets:install %PUBLIC_DIR%": "symfony-cmd"
         },
+        "check": [
+            "@test"
+        ],
+        "coverage": "docker run --rm -v \"$PWD\":/app -w /app php:8.4-cli sh -lc 'apt-get update >/dev/null && apt-get install -y git unzip libsqlite3-dev libzip-dev pkg-config >/dev/null && docker-php-ext-install pdo_sqlite >/dev/null && pecl install pcov >/dev/null && docker-php-ext-enable pcov >/dev/null && curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer >/dev/null && composer install --no-interaction --prefer-dist --no-progress >/dev/null && php -d pcov.enabled=1 bin/phpunit --coverage-text'",
+        "db:fixtures": "php bin/console doctrine:fixtures:load --no-interaction",
+        "db:migrate": "php bin/console doctrine:migrations:migrate --no-interaction",
         "post-install-cmd": [
             "@auto-scripts"
         ],
         "post-update-cmd": [
             "@auto-scripts"
-        ]
+        ],
+        "serve": "php -S 127.0.0.1:8000 -t public",
+        "test": "php bin/phpunit"
     },
     "conflict": {
         "symfony/symfony": "*"
