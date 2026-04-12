@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
+use JsonException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -37,13 +38,23 @@ abstract class AbstractApiController extends AbstractController
         ], JsonResponse::HTTP_UNPROCESSABLE_ENTITY);
     }
 
+    protected function malformedJsonResponse(): JsonResponse
+    {
+        return $this->validationErrorResponseFromErrors([
+            [
+                'field' => 'body',
+                'message' => 'Malformed JSON body.',
+            ],
+        ]);
+    }
+
     /**
      * @param array<string> $submittedFields
      */
-    protected function validateDto(object $dto, array $submittedFields = []): ?JsonResponse
+    protected function validateDto(object $dto, ?array $submittedFields = null): ?JsonResponse
     {
         $violations = $this->validator->validate($dto);
-        if ($submittedFields !== []) {
+        if ($submittedFields !== null) {
             $submittedFields = array_fill_keys($submittedFields, true);
             $filtered = [];
 
@@ -95,7 +106,7 @@ abstract class AbstractApiController extends AbstractController
             return [];
         }
 
-        $decoded = json_decode($content, true);
+        $decoded = json_decode($content, true, 512, JSON_THROW_ON_ERROR);
 
         return is_array($decoded) ? $decoded : [];
     }

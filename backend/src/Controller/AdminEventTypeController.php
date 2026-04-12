@@ -9,6 +9,7 @@ use App\Entity\Owner;
 use App\Repository\EventTypeRepository;
 use App\Repository\OwnerRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use JsonException;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -39,7 +40,12 @@ class AdminEventTypeController extends AbstractApiController
     #[Route('', methods: ['POST'])]
     public function create(Request $request): JsonResponse
     {
-        $payload = $this->decodeJson($request);
+        try {
+            $payload = $this->decodeJson($request);
+        } catch (JsonException) {
+            return $this->malformedJsonResponse();
+        }
+
         $dto = $this->hydrateCreateRequest($payload);
 
         if ($response = $this->validateDto($dto)) {
@@ -72,7 +78,12 @@ class AdminEventTypeController extends AbstractApiController
             return $this->json(['message' => 'Event type not found'], Response::HTTP_NOT_FOUND);
         }
 
-        $payload = $this->decodeJson($request);
+        try {
+            $payload = $this->decodeJson($request);
+        } catch (JsonException) {
+            return $this->malformedJsonResponse();
+        }
+
         $dto = $this->hydrateUpdateRequest($payload);
 
         if ($response = $this->validateDto($dto, array_keys($payload))) {

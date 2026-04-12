@@ -9,6 +9,7 @@ use App\Entity\Booking;
 use App\Exception\EventTypeNotFoundException;
 use App\Exception\SlotAlreadyBookedException;
 use App\Service\BookingService;
+use JsonException;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -28,7 +29,13 @@ final class PublicBookingController extends AbstractApiController
     #[Route('', methods: ['POST'])]
     public function create(Request $request): JsonResponse
     {
-        $dto = $this->hydrateCreateRequest($this->decodeJson($request));
+        try {
+            $payload = $this->decodeJson($request);
+        } catch (JsonException) {
+            return $this->malformedJsonResponse();
+        }
+
+        $dto = $this->hydrateCreateRequest($payload);
 
         if ($response = $this->validateDto($dto)) {
             return $response;

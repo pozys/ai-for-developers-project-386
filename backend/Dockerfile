@@ -8,9 +8,17 @@ COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
 WORKDIR /app
 
+ENV APP_ENV=prod \
+    APP_DEBUG=0 \
+    DATABASE_URL="sqlite:///%kernel.project_dir%/var/data/app.db"
+
 COPY . .
 
-RUN composer install --no-interaction --prefer-dist --no-progress
+RUN mkdir -p var/data \
+    && rm -f var/data/app.db \
+    && composer install --no-dev --optimize-autoloader --no-interaction --prefer-dist --no-progress \
+    && php bin/console doctrine:migrations:migrate --no-interaction \
+    && APP_ENV=dev php bin/console doctrine:fixtures:load --no-interaction
 
 EXPOSE 8000
 

@@ -63,6 +63,32 @@ class PublicBookingControllerTest extends ApiTestCase
         self::assertContains('startTime', array_column($data['errors'], 'field'));
     }
 
+    public function testCreateBookingMalformedJson(): void
+    {
+        $this->client->request(
+            'POST',
+            '/api/bookings',
+            server: [
+                'CONTENT_TYPE' => 'application/json',
+                'HTTP_ACCEPT' => 'application/json',
+            ],
+            content: '{"guestName":',
+        );
+
+        $response = $this->client->getResponse();
+
+        self::assertSame(Response::HTTP_UNPROCESSABLE_ENTITY, $response->getStatusCode());
+        self::assertSame([
+            'message' => 'Validation failed',
+            'errors' => [
+                [
+                    'field' => 'body',
+                    'message' => 'Malformed JSON body.',
+                ],
+            ],
+        ], $this->jsonResponse($response));
+    }
+
     public function testCreateBookingInvalidEventType(): void
     {
         $response = $this->requestJson('POST', '/api/bookings', [

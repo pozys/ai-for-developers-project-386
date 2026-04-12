@@ -65,6 +65,32 @@ class AdminEventTypeControllerTest extends ApiTestCase
         self::assertSame(['durationMinutes'], array_values(array_intersect(array_column($data['errors'], 'field'), ['durationMinutes'])));
     }
 
+    public function testCreateEventTypeMalformedJson(): void
+    {
+        $this->client->request(
+            'POST',
+            '/api/admin/event-types',
+            server: [
+                'CONTENT_TYPE' => 'application/json',
+                'HTTP_ACCEPT' => 'application/json',
+            ],
+            content: '{"name":',
+        );
+
+        $response = $this->client->getResponse();
+
+        self::assertSame(Response::HTTP_UNPROCESSABLE_ENTITY, $response->getStatusCode());
+        self::assertSame([
+            'message' => 'Validation failed',
+            'errors' => [
+                [
+                    'field' => 'body',
+                    'message' => 'Malformed JSON body.',
+                ],
+            ],
+        ], $this->jsonResponse($response));
+    }
+
     public function testUpdateEventType(): void
     {
         $eventType = $this->createEventType('Первичное название', 'Старое описание', 30);
@@ -106,6 +132,32 @@ class AdminEventTypeControllerTest extends ApiTestCase
         $data = $this->jsonResponse($response);
         self::assertSame('Validation failed', $data['message']);
         self::assertSame(['durationMinutes'], array_column($data['errors'], 'field'));
+    }
+
+    public function testUpdateEventTypeWithEmptyPayloadKeepsValues(): void
+    {
+        $eventType = $this->createEventType('Первичное название', 'Старое описание', 30);
+
+        $this->client->request(
+            'PUT',
+            '/api/admin/event-types/'.$eventType->getId(),
+            server: [
+                'CONTENT_TYPE' => 'application/json',
+                'HTTP_ACCEPT' => 'application/json',
+            ],
+            content: '{}',
+        );
+
+        $response = $this->client->getResponse();
+
+        self::assertSame(Response::HTTP_OK, $response->getStatusCode());
+        self::assertSame([
+            'id' => $eventType->getId(),
+            'ownerId' => OwnerFixture::OWNER_ID,
+            'name' => 'Первичное название',
+            'description' => 'Старое описание',
+            'durationMinutes' => 30,
+        ], $this->jsonResponse($response));
     }
 
     public function testListEventTypesReturnsAll(): void

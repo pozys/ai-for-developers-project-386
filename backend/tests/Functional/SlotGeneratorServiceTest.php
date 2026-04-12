@@ -59,6 +59,17 @@ class SlotGeneratorServiceTest extends ApiTestCase
         self::assertCount(8, $this->slotGeneratorService()->generateSlots($eventType, '2026-04-13'));
     }
 
+    public function testGenerateSlotsForFortyFiveMinutes(): void
+    {
+        $eventType = $this->createEventType('Workshop', 'Forty five minutes', 45);
+
+        $slots = $this->slotGeneratorService()->generateSlots($eventType, '2026-04-13');
+
+        self::assertCount(10, $slots);
+        self::assertSame('2026-04-13T06:45:00+00:00', $slots[1]['startTime']);
+        self::assertSame('2026-04-13T13:30:00+00:00', $slots[9]['endTime']);
+    }
+
     public function testGenerateSlotsOutsideWindowReturnsEmpty(): void
     {
         $eventType = $this->createEventType('Discovery call', 'Thirty minutes', 30);
