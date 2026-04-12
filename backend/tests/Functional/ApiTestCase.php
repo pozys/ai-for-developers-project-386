@@ -24,6 +24,7 @@ abstract class ApiTestCase extends WebTestCase
     {
         self::ensureKernelShutdown();
         $this->client = static::createClient();
+        $this->client->disableReboot();
         $this->entityManager = static::getContainer()->get(EntityManagerInterface::class);
 
         $this->resetDatabase();
