@@ -1,0 +1,8 @@
+nelmio_cors:
+    defaults:
+        allow_origin: ['%env(CORS_ALLOW_ORIGIN)%']
+        allow_methods: ['GET', 'POST', 'PUT', 'OPTIONS']
+        allow_headers: ['Content-Type']
+        max_age: 3600
+    paths:
+        '^/': null

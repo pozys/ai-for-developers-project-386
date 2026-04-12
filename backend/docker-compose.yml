@@ -1,0 +1,8 @@
+services:
+  backend:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      APP_ENV: dev
+      DATABASE_URL: "sqlite:///%kernel.project_dir%/var/data/app.db"
