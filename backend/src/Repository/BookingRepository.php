@@ -15,4 +15,12 @@ class BookingRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, Booking::class);
     }
+
+    /**
+     * @return array<int, Booking>
+     */
+    public function findAllOrderedByStartTime(): array
+    {
+        return $this->findBy([], ['startTime' => 'ASC']);
+    }
 }
