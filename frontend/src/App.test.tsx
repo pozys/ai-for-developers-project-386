@@ -17,7 +17,7 @@ describe('App', () => {
   it('renders home route with navigation shell', async () => {
     renderApp()
 
-    expect(screen.getByText('Home')).toBeInTheDocument()
+    expect(screen.getByText('Главная')).toBeInTheDocument()
     expect(screen.getByText('Админка')).toBeInTheDocument()
     expect(await screen.findByText('Пока нет доступных слотов')).toBeInTheDocument()
   })

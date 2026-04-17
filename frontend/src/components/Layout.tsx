@@ -30,16 +30,16 @@ export default function Layout({ children }: LayoutProps) {
         >
           <div className="flex items-center gap-3">
             <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-primary text-primary-foreground shadow-sm shadow-primary/20">
-              <span className="font-heading text-lg leading-none">B</span>
+              <span className="font-heading text-lg leading-none">В</span>
             </div>
             <div className="leading-tight">
-              <p className="font-heading text-lg">Booking Call</p>
-              <p className="text-xs text-muted-foreground">Запись на звонок без лишних шагов</p>
+              <p className="font-heading text-lg">Встречалка</p>
+              <p className="text-xs text-muted-foreground">Запись на встречу без лишних шагов</p>
             </div>
           </div>
           <div className="flex flex-wrap items-center gap-2">
             <NavLink to="/" end className={({ isActive }) => getNavLinkClassName(isActive)}>
-              Home
+              Главная
             </NavLink>
             <NavLink
               to="/admin/event-types"
