@@ -14,3 +14,10 @@ CLAUDE.md
 .github/copilot-instructions.md
 AGENTS.md
 .codex
+
+# Playwright
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
+/playwright/.auth/
