@@ -5,6 +5,23 @@
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>frontend</title>
+    <script>
+      (() => {
+        const storageKey = 'app-theme'
+
+        try {
+          const storedTheme = localStorage.getItem(storageKey)
+          const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
+          const resolvedTheme = storedTheme === 'dark' || storedTheme === 'light' ? storedTheme : systemTheme
+          const rootElement = document.documentElement
+
+          rootElement.classList.toggle('dark', resolvedTheme === 'dark')
+          rootElement.style.colorScheme = resolvedTheme
+        } catch {
+          document.documentElement.style.colorScheme = 'light'
+        }
+      })()
+    </script>
   </head>
   <body>
     <div id="root"></div>

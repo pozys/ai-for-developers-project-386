@@ -1,6 +1,8 @@
 import type { ReactNode } from 'react'
 import { NavLink, Outlet } from 'react-router'
 
+import { ThemeToggle } from '@/theme/ThemeToggle'
+
 function getNavLinkClassName(isActive: boolean) {
   return [
     'inline-flex items-center rounded-full px-3 py-2 text-sm font-medium transition-all',
@@ -37,7 +39,7 @@ export default function Layout({ children }: LayoutProps) {
               <p className="text-xs text-muted-foreground">Запись на встречу без лишних шагов</p>
             </div>
           </div>
-          <div className="flex flex-wrap items-center gap-2">
+          <div className="flex flex-wrap items-center justify-end gap-2">
             <NavLink to="/" end className={({ isActive }) => getNavLinkClassName(isActive)}>
               Главная
             </NavLink>
@@ -47,6 +49,7 @@ export default function Layout({ children }: LayoutProps) {
             >
               Админка
             </NavLink>
+            <ThemeToggle />
           </div>
         </nav>
       </header>
