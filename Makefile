@@ -2,7 +2,7 @@
 	install \
 	serve \
 	db-migrate db-fixtures \
-	test test-coverage \
+	test test-backend test-frontend test-e2e test-coverage \
 	e2e e2e-ui e2e-report \
 	dev build
 
@@ -21,7 +21,16 @@ db-fixtures:
 	cd backend && composer db:fixtures
 
 test:
+	$(MAKE) test-backend
+
+test-backend:
 	cd backend && composer test
+
+test-frontend:
+	cd frontend && npm run test:unit
+
+test-e2e:
+	cd frontend && npm run test:e2e
 
 test-coverage:
 	cd backend && composer coverage
@@ -35,7 +44,7 @@ build:
 	cd frontend && npm run build
 
 e2e:
-	cd frontend && npx playwright test
+	$(MAKE) test-e2e
 
 e2e-ui:
 	cd frontend && npx playwright test --ui
