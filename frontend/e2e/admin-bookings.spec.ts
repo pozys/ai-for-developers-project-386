@@ -3,12 +3,15 @@ import { expect, test } from '@playwright/test'
 import {
   createEventTypeAndGetId,
   fillBookingForm,
+  getE2ENow,
   makeUniqueValue,
   selectBookingDate,
   selectFirstAvailableSlot,
 } from './helpers'
 
 test.describe('Админка бронирований', () => {
+  const e2eNow = getE2ENow()
+
   test('показывает созданную запись в списке', async ({ page }) => {
     const guestName = makeUniqueValue('Guest list')
     const guestEmail = `guest-list-${Date.now().toString(36)}@example.com`
@@ -20,7 +23,7 @@ test.describe('Админка бронирований', () => {
     })
 
     await page.goto(`/event-types/${eventTypeId}/book`)
-    await selectBookingDate(page, 3)
+    await selectBookingDate(page, 3, e2eNow)
     await selectFirstAvailableSlot(page)
     await fillBookingForm(page, {
       guestName,

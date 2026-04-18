@@ -3,12 +3,15 @@ import { expect, test } from '@playwright/test'
 import {
   createEventTypeAndGetId,
   fillBookingForm,
+  getE2ENow,
   makeUniqueValue,
   selectBookingDate,
   selectFirstAvailableSlot,
 } from './helpers'
 
 test.describe('Публичное бронирование', () => {
+  const e2eNow = getE2ENow()
+
   test('проходит полный happy-path бронирования', async ({ page }) => {
     const guestName = makeUniqueValue('Guest')
     const guestEmail = `guest-${Date.now().toString(36)}@example.com`
@@ -22,7 +25,7 @@ test.describe('Публичное бронирование', () => {
     await page.goto(`/event-types/${eventTypeId}/book`)
     await expect(page).toHaveURL(new RegExp(`/event-types/${eventTypeId}/book`))
 
-    await selectBookingDate(page, 0)
+    await selectBookingDate(page, 0, e2eNow)
     await selectFirstAvailableSlot(page)
     await fillBookingForm(page, {
       guestName,
@@ -58,8 +61,8 @@ test.describe('Публичное бронирование', () => {
 
     await secondPage.goto(`/event-types/${eventTypeId}/book`)
 
-    await selectBookingDate(firstPage, 1)
-    await selectBookingDate(secondPage, 1)
+    await selectBookingDate(firstPage, 1, e2eNow)
+    await selectBookingDate(secondPage, 1, e2eNow)
     await selectFirstAvailableSlot(firstPage)
     await selectFirstAvailableSlot(secondPage)
 
@@ -92,7 +95,7 @@ test.describe('Публичное бронирование', () => {
     await page.goto(`/event-types/${eventTypeId}/book`)
     await expect(page).toHaveURL(new RegExp(`/event-types/${eventTypeId}/book`))
 
-    await selectBookingDate(page, 2)
+    await selectBookingDate(page, 2, e2eNow)
     await selectFirstAvailableSlot(page)
     await page.getByRole('button', { name: 'Подтвердить запись' }).click()
 

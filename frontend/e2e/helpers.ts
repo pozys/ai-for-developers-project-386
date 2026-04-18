@@ -63,6 +63,18 @@ export function getSelectableDateKey(offsetWeekdays = 0, now = new Date()) {
   return formatDateKey(currentDate)
 }
 
+function buildStableMoscowNoon(baseNow: Date) {
+  const { year, month, day } = getDateKeyParts(baseNow, MOSCOW_TIME_ZONE)
+
+  return new Date(`${year}-${month}-${day}T12:00:00+03:00`)
+}
+
+const E2E_REFERENCE_NOW_MSK = buildStableMoscowNoon(new Date())
+
+export function getE2ENow() {
+  return new Date(E2E_REFERENCE_NOW_MSK.getTime())
+}
+
 export function formatCalendarDayLabel(dateKey: string) {
   return new Intl.DateTimeFormat('ru-RU', {
     timeZone: 'UTC',
@@ -77,8 +89,8 @@ export function makeUniqueValue(prefix: string) {
   return `${prefix} ${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`
 }
 
-export async function selectBookingDate(page: Page, offsetWeekdays: number) {
-  const dateKey = getSelectableDateKey(offsetWeekdays)
+export async function selectBookingDate(page: Page, offsetWeekdays: number, now = getE2ENow()) {
+  const dateKey = getSelectableDateKey(offsetWeekdays, now)
   await page.getByRole('button', { name: formatCalendarDayLabel(dateKey) }).click()
 
   return dateKey
