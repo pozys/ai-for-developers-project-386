@@ -13,21 +13,29 @@ class SlotGeneratorServiceTest extends ApiTestCase
     public function testGenerateSlotsForWeekday(): void
     {
         $eventType = $this->createEventType('Discovery call', 'Thirty minutes', 30);
+        $date = $this->inWindowWeekdayDate();
 
-        $slots = $this->slotGeneratorService()->generateSlots($eventType, '2026-04-13');
+        $slots = $this->slotGeneratorService()->generateSlots($eventType, $date->format('Y-m-d'));
 
         self::assertCount(16, $slots);
-        self::assertSame('2026-04-13T06:00:00+00:00', $slots[0]['startTime']);
-        self::assertSame('2026-04-13T14:00:00+00:00', $slots[15]['endTime']);
+        self::assertSame($this->moscowDateToUtcAtom(9, 0, $date), $slots[0]['startTime']);
+        self::assertSame($this->moscowDateToUtcAtom(17, 0, $date), $slots[15]['endTime']);
         self::assertTrue(array_reduce($slots, static fn (bool $carry, array $slot): bool => $carry && $slot['available'], true));
     }
 
     public function testGenerateSlotsMarksBookedSlotUnavailable(): void
     {
         $eventType = $this->createEventType('Discovery call', 'Thirty minutes', 30);
-        $this->createBooking($eventType, '2026-04-13 06:00:00 UTC', '2026-04-13 06:30:00 UTC');
+        $date = $this->inWindowWeekdayDate();
+        $bookingStart = $this->moscowDateToUtc(9, 0, $date);
+        $bookingEnd = $bookingStart->modify('+30 minutes');
+        $this->createBooking(
+            $eventType,
+            $bookingStart->format('Y-m-d H:i:s').' UTC',
+            $bookingEnd->format('Y-m-d H:i:s').' UTC',
+        );
 
-        $slots = $this->slotGeneratorService()->generateSlots($eventType, '2026-04-13');
+        $slots = $this->slotGeneratorService()->generateSlots($eventType, $date->format('Y-m-d'));
 
         self::assertFalse($slots[0]['available']);
         self::assertTrue($slots[1]['available']);
@@ -41,39 +49,42 @@ class SlotGeneratorServiceTest extends ApiTestCase
 
         self::assertNotEmpty($slots);
 
-        $expectedDate = $this->nextWeekday(new DateTimeImmutable('now', new DateTimeZone('Europe/Moscow')))->format('Y-m-d');
+        $expectedDate = $this->nextWeekday($this->todayMoscow())->format('Y-m-d');
         self::assertSame($expectedDate, (new DateTimeImmutable($slots[0]['startTime']))->setTimezone(new DateTimeZone('Europe/Moscow'))->format('Y-m-d'));
     }
 
     public function testGenerateSlotsForWeekendReturnsEmpty(): void
     {
         $eventType = $this->createEventType('Discovery call', 'Thirty minutes', 30);
+        $weekendDate = $this->nextWeekendDate()->format('Y-m-d');
 
-        self::assertSame([], $this->slotGeneratorService()->generateSlots($eventType, '2026-04-18'));
+        self::assertSame([], $this->slotGeneratorService()->generateSlots($eventType, $weekendDate));
     }
 
     public function testGenerateSlotsForSixtyMinutes(): void
     {
         $eventType = $this->createEventType('Strategy session', 'Sixty minutes', 60);
+        $date = $this->inWindowWeekdayDate()->format('Y-m-d');
 
-        self::assertCount(8, $this->slotGeneratorService()->generateSlots($eventType, '2026-04-13'));
+        self::assertCount(8, $this->slotGeneratorService()->generateSlots($eventType, $date));
     }
 
     public function testGenerateSlotsForFortyFiveMinutes(): void
     {
         $eventType = $this->createEventType('Workshop', 'Forty five minutes', 45);
+        $date = $this->inWindowWeekdayDate();
 
-        $slots = $this->slotGeneratorService()->generateSlots($eventType, '2026-04-13');
+        $slots = $this->slotGeneratorService()->generateSlots($eventType, $date->format('Y-m-d'));
 
         self::assertCount(10, $slots);
-        self::assertSame('2026-04-13T06:45:00+00:00', $slots[1]['startTime']);
-        self::assertSame('2026-04-13T13:30:00+00:00', $slots[9]['endTime']);
+        self::assertSame($this->moscowDateToUtcAtom(9, 45, $date), $slots[1]['startTime']);
+        self::assertSame($this->moscowDateToUtcAtom(16, 30, $date), $slots[9]['endTime']);
     }
 
     public function testGenerateSlotsOutsideWindowReturnsEmpty(): void
     {
         $eventType = $this->createEventType('Discovery call', 'Thirty minutes', 30);
-        $date = $this->todayMoscow()->modify('+14 days')->format('Y-m-d');
+        $date = $this->outsideWindowDate()->format('Y-m-d');
 
         self::assertSame([], $this->slotGeneratorService()->generateSlots($eventType, $date));
     }
@@ -81,19 +92,5 @@ class SlotGeneratorServiceTest extends ApiTestCase
     private function slotGeneratorService(): SlotGeneratorService
     {
         return static::getContainer()->get(SlotGeneratorService::class);
-    }
-
-    private function todayMoscow(): DateTimeImmutable
-    {
-        return new DateTimeImmutable('now', new DateTimeZone('Europe/Moscow'));
-    }
-
-    private function nextWeekday(DateTimeImmutable $date): DateTimeImmutable
-    {
-        while (in_array($date->format('N'), ['6', '7'], true)) {
-            $date = $date->modify('+1 day');
-        }
-
-        return $date;
     }
 }

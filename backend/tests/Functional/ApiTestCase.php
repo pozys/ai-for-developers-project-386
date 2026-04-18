@@ -8,6 +8,8 @@ use App\DataFixtures\OwnerFixture;
 use App\Entity\Booking;
 use App\Entity\EventType;
 use App\Entity\Owner;
+use DateTimeImmutable;
+use DateTimeZone;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Tools\SchemaTool;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
@@ -17,8 +19,12 @@ use Symfony\Component\Uid\Uuid;
 
 abstract class ApiTestCase extends WebTestCase
 {
+    private const MOSCOW_TIMEZONE = 'Europe/Moscow';
+    private const UTC_TIMEZONE = 'UTC';
+
     protected KernelBrowser $client;
     protected EntityManagerInterface $entityManager;
+    protected DateTimeImmutable $referenceNowMoscow;
 
     protected function setUp(): void
     {
@@ -26,6 +32,7 @@ abstract class ApiTestCase extends WebTestCase
         $this->client = static::createClient();
         $this->client->disableReboot();
         $this->entityManager = static::getContainer()->get(EntityManagerInterface::class);
+        $this->referenceNowMoscow = new DateTimeImmutable('now', new DateTimeZone(self::MOSCOW_TIMEZONE));
 
         $this->resetDatabase();
         $this->loadFixtures();
@@ -33,7 +40,7 @@ abstract class ApiTestCase extends WebTestCase
 
     protected function tearDown(): void
     {
-        unset($this->client, $this->entityManager);
+        unset($this->client, $this->entityManager, $this->referenceNowMoscow);
         self::ensureKernelShutdown();
     }
 
@@ -110,6 +117,52 @@ abstract class ApiTestCase extends WebTestCase
         $this->entityManager->flush();
 
         return $booking;
+    }
+
+    protected function todayMoscow(): DateTimeImmutable
+    {
+        return $this->referenceNowMoscow->setTime(0, 0);
+    }
+
+    protected function inWindowWeekdayDate(): DateTimeImmutable
+    {
+        return $this->nextWeekday($this->todayMoscow());
+    }
+
+    protected function nextWeekendDate(): DateTimeImmutable
+    {
+        $date = $this->todayMoscow();
+        while (!in_array($date->format('N'), ['6', '7'], true)) {
+            $date = $date->modify('+1 day');
+        }
+
+        return $date;
+    }
+
+    protected function outsideWindowDate(): DateTimeImmutable
+    {
+        return $this->todayMoscow()->modify('+14 days');
+    }
+
+    protected function nextWeekday(DateTimeImmutable $date): DateTimeImmutable
+    {
+        while (in_array($date->format('N'), ['6', '7'], true)) {
+            $date = $date->modify('+1 day');
+        }
+
+        return $date;
+    }
+
+    protected function moscowDateToUtc(int $hour, int $minute, DateTimeImmutable $moscowDate): DateTimeImmutable
+    {
+        return $moscowDate
+            ->setTime($hour, $minute)
+            ->setTimezone(new DateTimeZone(self::UTC_TIMEZONE));
+    }
+
+    protected function moscowDateToUtcAtom(int $hour, int $minute, DateTimeImmutable $moscowDate): string
+    {
+        return $this->moscowDateToUtc($hour, $minute, $moscowDate)->format(DATE_ATOM);
     }
 
     private function resetDatabase(): void

@@ -30,24 +30,32 @@ class PublicEventTypeControllerTest extends ApiTestCase
     public function testListSlotsForWeekday(): void
     {
         $eventType = $this->createEventType('Discovery call', 'Thirty minutes', 30);
+        $date = $this->inWindowWeekdayDate();
 
-        $response = $this->requestJson('GET', '/api/event-types/'.$eventType->getId().'/slots?date=2026-04-13');
+        $response = $this->requestJson('GET', '/api/event-types/'.$eventType->getId().'/slots?date='.$date->format('Y-m-d'));
 
         self::assertSame(Response::HTTP_OK, $response->getStatusCode());
 
         $slots = $this->jsonResponse($response);
         self::assertCount(16, $slots);
-        self::assertSame('2026-04-13T06:00:00+00:00', $slots[0]['startTime']);
-        self::assertSame('2026-04-13T14:00:00+00:00', $slots[15]['endTime']);
+        self::assertSame($this->moscowDateToUtcAtom(9, 0, $date), $slots[0]['startTime']);
+        self::assertSame($this->moscowDateToUtcAtom(17, 0, $date), $slots[15]['endTime']);
         self::assertTrue(array_reduce($slots, static fn (bool $carry, array $slot): bool => $carry && $slot['available'], true));
     }
 
     public function testListSlotsWithBooking(): void
     {
         $eventType = $this->createEventType('Discovery call', 'Thirty minutes', 30);
-        $this->createBooking($eventType, '2026-04-13 06:00:00 UTC', '2026-04-13 06:30:00 UTC');
+        $date = $this->inWindowWeekdayDate();
+        $bookingStart = $this->moscowDateToUtc(9, 0, $date);
+        $bookingEnd = $bookingStart->modify('+30 minutes');
+        $this->createBooking(
+            $eventType,
+            $bookingStart->format('Y-m-d H:i:s').' UTC',
+            $bookingEnd->format('Y-m-d H:i:s').' UTC',
+        );
 
-        $response = $this->requestJson('GET', '/api/event-types/'.$eventType->getId().'/slots?date=2026-04-13');
+        $response = $this->requestJson('GET', '/api/event-types/'.$eventType->getId().'/slots?date='.$date->format('Y-m-d'));
 
         self::assertSame(Response::HTTP_OK, $response->getStatusCode());
 
@@ -67,15 +75,16 @@ class PublicEventTypeControllerTest extends ApiTestCase
         $slots = $this->jsonResponse($response);
         self::assertCount(16, $slots);
 
-        $expectedDate = $this->nextWeekday(new DateTimeImmutable('now', new DateTimeZone('Europe/Moscow')))->format('Y-m-d');
+        $expectedDate = $this->nextWeekday($this->todayMoscow())->format('Y-m-d');
         self::assertSame($expectedDate, (new DateTimeImmutable($slots[0]['startTime']))->setTimezone(new DateTimeZone('Europe/Moscow'))->format('Y-m-d'));
     }
 
     public function testListSlotsForWeekend(): void
     {
         $eventType = $this->createEventType('Discovery call', 'Thirty minutes', 30);
+        $date = $this->nextWeekendDate()->format('Y-m-d');
 
-        $response = $this->requestJson('GET', '/api/event-types/'.$eventType->getId().'/slots?date=2026-04-18');
+        $response = $this->requestJson('GET', '/api/event-types/'.$eventType->getId().'/slots?date='.$date);
 
         self::assertSame(Response::HTTP_OK, $response->getStatusCode());
         self::assertSame([], $this->jsonResponse($response));
@@ -84,7 +93,7 @@ class PublicEventTypeControllerTest extends ApiTestCase
     public function testListSlotsOutsideWindow(): void
     {
         $eventType = $this->createEventType('Discovery call', 'Thirty minutes', 30);
-        $outOfWindowDate = $this->todayMoscow()->modify('+14 days')->format('Y-m-d');
+        $outOfWindowDate = $this->outsideWindowDate()->format('Y-m-d');
 
         $response = $this->requestJson('GET', '/api/event-types/'.$eventType->getId().'/slots?date='.$outOfWindowDate);
 
@@ -95,8 +104,9 @@ class PublicEventTypeControllerTest extends ApiTestCase
     public function testListSlots60MinDuration(): void
     {
         $eventType = $this->createEventType('Strategy session', 'Sixty minutes', 60);
+        $date = $this->inWindowWeekdayDate()->format('Y-m-d');
 
-        $response = $this->requestJson('GET', '/api/event-types/'.$eventType->getId().'/slots?date=2026-04-13');
+        $response = $this->requestJson('GET', '/api/event-types/'.$eventType->getId().'/slots?date='.$date);
 
         self::assertSame(Response::HTTP_OK, $response->getStatusCode());
         self::assertCount(8, $this->jsonResponse($response));
@@ -108,19 +118,5 @@ class PublicEventTypeControllerTest extends ApiTestCase
 
         self::assertSame(Response::HTTP_NOT_FOUND, $response->getStatusCode());
         self::assertSame(['message' => 'Event type not found'], $this->jsonResponse($response));
-    }
-
-    private function todayMoscow(): DateTimeImmutable
-    {
-        return new DateTimeImmutable('now', new DateTimeZone('Europe/Moscow'));
-    }
-
-    private function nextWeekday(DateTimeImmutable $date): DateTimeImmutable
-    {
-        while (in_array($date->format('N'), ['6', '7'], true)) {
-            $date = $date->modify('+1 day');
-        }
-
-        return $date;
     }
 }
