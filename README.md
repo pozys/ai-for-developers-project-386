@@ -5,6 +5,12 @@
 
 Запись на встречу без лишних шагов.
 
+## Демо
+
+Публичная версия: https://vstrechalka.onrender.com
+
+[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://vstrechalka.onrender.com)
+
 ## Возможности
 - Публичная запись без регистрации
 - Выбор формата встречи, даты и свободного слота
