@@ -1,0 +1,15 @@
+node_modules/
+frontend/node_modules/
+frontend/dist/
+frontend/playwright-report/
+frontend/test-results/
+backend/vendor/
+backend/var/cache/
+backend/var/log/
+backend/var/data/
+agent/
+tsp-output/
+test-results/
+tests/
+.git/
+.github/
