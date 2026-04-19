@@ -26,7 +26,7 @@ PHP 8.4, Symfony 7.2, Doctrine
 ## Проверка качества
 - Локально: `make lint`, `make lint-backend`, `make lint-frontend`, `make format`
 - Pre-commit: `husky` + `lint-staged` (только staged-файлы)
-- CI: blocking jobs `backend-lint` и `frontend-lint`
+- CI: blocking job `quality`
 - Проверяется весь репозиторий; при любой ошибке линтера или статического анализа проверка завершается с ошибкой
 
 ## Запуск

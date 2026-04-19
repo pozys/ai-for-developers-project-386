@@ -46,10 +46,22 @@ case "${1:-}" in
 			exit 0
 		fi
 
+		normalized_paths=()
+		for path in "$@"; do
+			case "$path" in
+				backend/*)
+					normalized_paths+=("${path#backend/}")
+					;;
+				*)
+					normalized_paths+=("$path")
+					;;
+			esac
+		done
+
 		build_image
 		run_backend \
 			"$bootstrap && vendor/bin/php-cs-fixer fix --config=.php-cs-fixer.dist.php --path-mode=intersection --allow-risky=yes \"\$@\"" \
-			"$@"
+			"${normalized_paths[@]}"
 		;;
 	*)
 		cat <<'EOF' >&2
