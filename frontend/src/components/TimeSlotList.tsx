@@ -1,19 +1,19 @@
-import type { TimeSlot } from '@/types/api'
+import type { TimeSlot } from "@/types/api";
 
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
-import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
-import { Skeleton } from '@/components/ui/skeleton'
-import { formatDateLabel, formatSlotRange } from '@/lib/date'
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Skeleton } from "@/components/ui/skeleton";
+import { formatDateLabel, formatSlotRange } from "@/lib/date";
 
 interface TimeSlotListProps {
-  slots: TimeSlot[]
-  selectedDate: string
-  selectedSlotStartTime?: string | null
-  isLoading: boolean
-  errorMessage?: string | null
-  onSelectSlot: (slot: TimeSlot) => void
-  onRetry?: () => void
+  slots: TimeSlot[];
+  selectedDate: string;
+  selectedSlotStartTime?: string | null;
+  isLoading: boolean;
+  errorMessage?: string | null;
+  onSelectSlot: (slot: TimeSlot) => void;
+  onRetry?: () => void;
 }
 
 export default function TimeSlotList({
@@ -25,7 +25,7 @@ export default function TimeSlotList({
   onSelectSlot,
   onRetry,
 }: TimeSlotListProps) {
-  const availableSlots = slots.filter((slot) => slot.available)
+  const availableSlots = slots.filter((slot) => slot.available);
 
   return (
     <section
@@ -34,7 +34,10 @@ export default function TimeSlotList({
     >
       <div className="flex items-start justify-between gap-3">
         <div>
-          <h2 id="time-slot-list-heading" className="text-lg font-semibold tracking-tight">
+          <h2
+            id="time-slot-list-heading"
+            className="text-lg font-semibold tracking-tight"
+          >
             Свободное время
           </h2>
           <p className="text-sm text-muted-foreground capitalize">
@@ -71,7 +74,9 @@ export default function TimeSlotList({
       ) : null}
 
       {!isLoading && !errorMessage && slots.length === 0 ? (
-        <p className="text-sm text-muted-foreground">На этот день свободных слотов нет.</p>
+        <p className="text-sm text-muted-foreground">
+          На этот день свободных слотов нет.
+        </p>
       ) : null}
 
       {!isLoading && !errorMessage && slots.length > 0 ? (
@@ -82,30 +87,34 @@ export default function TimeSlotList({
 
           <div className="space-y-2">
             {slots.map((slot) => {
-              const isSelected = slot.startTime === selectedSlotStartTime
-              const slotRange = formatSlotRange(slot.startTime, slot.endTime)
+              const isSelected = slot.startTime === selectedSlotStartTime;
+              const slotRange = formatSlotRange(slot.startTime, slot.endTime);
 
               return (
                 <Button
                   key={slot.startTime}
                   type="button"
-                  variant={isSelected ? 'default' : 'outline'}
+                  variant={isSelected ? "default" : "outline"}
                   className="h-11 w-full justify-between rounded-xl px-4"
-                  aria-label={slot.available ? `Выбрать слот ${slotRange}` : `Слот занят ${slotRange}`}
+                  aria-label={
+                    slot.available
+                      ? `Выбрать слот ${slotRange}`
+                      : `Слот занят ${slotRange}`
+                  }
                   aria-pressed={slot.available ? isSelected : undefined}
                   disabled={!slot.available}
                   onClick={() => onSelectSlot(slot)}
                 >
                   <span>{slotRange}</span>
                   <span className="text-xs text-muted-foreground">
-                    {slot.available ? 'Свободно' : 'Занято'}
+                    {slot.available ? "Свободно" : "Занято"}
                   </span>
                 </Button>
-              )
+              );
             })}
           </div>
         </>
       ) : null}
     </section>
-  )
+  );
 }

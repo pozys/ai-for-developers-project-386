@@ -1,7 +1,7 @@
-import { useEffect, useState } from 'react'
-import { ChevronLeft, ChevronRight } from 'lucide-react'
+import { useEffect, useState } from "react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 
-import { Button } from '@/components/ui/button'
+import { Button } from "@/components/ui/button";
 import {
   addMonth,
   formatCalendarDayLabel,
@@ -10,12 +10,12 @@ import {
   getWeekdayLabels,
   getMonthStart,
   hasSelectableDaysInMonth,
-} from '@/lib/bookingDate'
+} from "@/lib/bookingDate";
 
 interface CalendarGridProps {
-  selectedDate: string
-  onSelectDate: (dateKey: string) => void
-  now?: Date
+  selectedDate: string;
+  onSelectDate: (dateKey: string) => void;
+  now?: Date;
 }
 
 export default function CalendarGrid({
@@ -23,20 +23,25 @@ export default function CalendarGrid({
   onSelectDate,
   now = new Date(),
 }: CalendarGridProps) {
-  const [displayedMonth, setDisplayedMonth] = useState(() => getMonthStart(selectedDate))
-  const previousMonth = addMonth(displayedMonth, -1)
-  const nextMonth = addMonth(displayedMonth, 1)
-  const days = getCalendarDays(displayedMonth, now)
+  const [displayedMonth, setDisplayedMonth] = useState(() =>
+    getMonthStart(selectedDate),
+  );
+  const previousMonth = addMonth(displayedMonth, -1);
+  const nextMonth = addMonth(displayedMonth, 1);
+  const days = getCalendarDays(displayedMonth, now);
 
   useEffect(() => {
-    setDisplayedMonth(getMonthStart(selectedDate))
-  }, [selectedDate])
+    setDisplayedMonth(getMonthStart(selectedDate));
+  }, [selectedDate]);
 
   return (
     <section aria-labelledby="calendar-grid-heading" className="space-y-4">
       <div className="flex items-center justify-between gap-3">
         <div>
-          <h2 id="calendar-grid-heading" className="text-lg font-semibold tracking-tight">
+          <h2
+            id="calendar-grid-heading"
+            className="text-lg font-semibold tracking-tight"
+          >
             Выберите дату
           </h2>
           <p className="text-sm text-muted-foreground">
@@ -85,13 +90,13 @@ export default function CalendarGrid({
 
         <div className="grid grid-cols-7 gap-2">
           {days.map((day) => {
-            const isSelected = day.dateKey === selectedDate
+            const isSelected = day.dateKey === selectedDate;
 
             return (
               <Button
                 key={day.dateKey}
                 type="button"
-                variant={isSelected ? 'default' : 'ghost'}
+                variant={isSelected ? "default" : "ghost"}
                 className="h-11 w-full rounded-xl px-0 text-sm"
                 aria-label={formatCalendarDayLabel(day.dateKey)}
                 aria-pressed={isSelected}
@@ -100,16 +105,18 @@ export default function CalendarGrid({
               >
                 <span
                   className={
-                    day.isCurrentMonth ? 'text-sm font-medium' : 'text-sm text-muted-foreground'
+                    day.isCurrentMonth
+                      ? "text-sm font-medium"
+                      : "text-sm text-muted-foreground"
                   }
                 >
                   {day.dayOfMonth}
                 </span>
               </Button>
-            )
+            );
           })}
         </div>
       </div>
     </section>
-  )
+  );
 }

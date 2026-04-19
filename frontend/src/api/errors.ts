@@ -1,4 +1,4 @@
-import type { ErrorResponse } from '@/types/api';
+import type { ErrorResponse } from "@/types/api";
 
 export class ApiError extends Error {
   readonly status: number;
@@ -6,7 +6,7 @@ export class ApiError extends Error {
 
   constructor(status: number, errorResponse: ErrorResponse) {
     super(errorResponse.message);
-    this.name = 'ApiError';
+    this.name = "ApiError";
     this.status = status;
     this.errorResponse = errorResponse;
   }

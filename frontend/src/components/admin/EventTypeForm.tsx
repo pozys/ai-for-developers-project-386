@@ -1,67 +1,74 @@
-import { useEffect, useState } from 'react'
-import type { FormEvent } from 'react'
+import { useEffect, useState } from "react";
+import type { FormEvent } from "react";
 
-import { ApiError } from '@/api/errors'
-import type { CreateEventTypeRequest } from '@/types/api'
+import { ApiError } from "@/api/errors";
+import type { CreateEventTypeRequest } from "@/types/api";
 
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader } from '@/components/ui/card'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Textarea } from '@/components/ui/textarea'
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 
 interface EventTypeFormProps {
-  title: string
-  description: string
-  submitLabel: string
-  initialValues?: CreateEventTypeRequest
-  onSubmit: (values: CreateEventTypeRequest) => Promise<void>
-  onCancel: () => void
-  cancelLabel?: string
-  getErrorMessage?: (error: unknown) => string
+  title: string;
+  description: string;
+  submitLabel: string;
+  initialValues?: CreateEventTypeRequest;
+  onSubmit: (values: CreateEventTypeRequest) => Promise<void>;
+  onCancel: () => void;
+  cancelLabel?: string;
+  getErrorMessage?: (error: unknown) => string;
 }
 
-type EventTypeField = keyof CreateEventTypeRequest
-type EventTypeFieldErrors = Partial<Record<EventTypeField, string>>
+type EventTypeField = keyof CreateEventTypeRequest;
+type EventTypeFieldErrors = Partial<Record<EventTypeField, string>>;
 
 const defaultValues: CreateEventTypeRequest = {
-  name: '',
-  description: '',
+  name: "",
+  description: "",
   durationMinutes: 60,
-}
+};
 
 function isEventTypeField(field: string): field is EventTypeField {
-  return field === 'name' || field === 'description' || field === 'durationMinutes'
+  return (
+    field === "name" || field === "description" || field === "durationMinutes"
+  );
 }
 
 function getValidationErrors(values: {
-  name: string
-  description: string
-  durationMinutes: string
+  name: string;
+  description: string;
+  durationMinutes: string;
 }): EventTypeFieldErrors {
-  const errors: EventTypeFieldErrors = {}
+  const errors: EventTypeFieldErrors = {};
 
   if (!values.name.trim()) {
-    errors.name = 'Укажите название типа события'
+    errors.name = "Укажите название типа события";
   }
 
   if (!values.description.trim()) {
-    errors.description = 'Укажите описание типа события'
+    errors.description = "Укажите описание типа события";
   }
 
   if (!values.durationMinutes.trim()) {
-    errors.durationMinutes = 'Укажите длительность встречи'
+    errors.durationMinutes = "Укажите длительность встречи";
   } else {
-    const durationMinutes = Number(values.durationMinutes)
+    const durationMinutes = Number(values.durationMinutes);
 
     if (!Number.isInteger(durationMinutes) || durationMinutes <= 0) {
-      errors.durationMinutes = 'Длительность должна быть положительным числом'
+      errors.durationMinutes = "Длительность должна быть положительным числом";
     }
   }
 
-  return errors
+  return errors;
 }
 
 export default function EventTypeForm({
@@ -71,98 +78,106 @@ export default function EventTypeForm({
   initialValues = defaultValues,
   onSubmit,
   onCancel,
-  cancelLabel = 'Отмена',
+  cancelLabel = "Отмена",
   getErrorMessage,
 }: EventTypeFormProps) {
-  const [name, setName] = useState(initialValues.name)
-  const [descriptionValue, setDescriptionValue] = useState(initialValues.description)
-  const [durationMinutes, setDurationMinutes] = useState(initialValues.durationMinutes.toString())
-  const [fieldErrors, setFieldErrors] = useState<EventTypeFieldErrors>({})
-  const [submitError, setSubmitError] = useState<string | null>(null)
-  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [name, setName] = useState(initialValues.name);
+  const [descriptionValue, setDescriptionValue] = useState(
+    initialValues.description,
+  );
+  const [durationMinutes, setDurationMinutes] = useState(
+    initialValues.durationMinutes.toString(),
+  );
+  const [fieldErrors, setFieldErrors] = useState<EventTypeFieldErrors>({});
+  const [submitError, setSubmitError] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
-    setName(initialValues.name)
-    setDescriptionValue(initialValues.description)
-    setDurationMinutes(initialValues.durationMinutes.toString())
-    setFieldErrors({})
-    setSubmitError(null)
-  }, [initialValues])
+    setName(initialValues.name);
+    setDescriptionValue(initialValues.description);
+    setDurationMinutes(initialValues.durationMinutes.toString());
+    setFieldErrors({});
+    setSubmitError(null);
+  }, [initialValues]);
 
   function handleFieldChange(field: EventTypeField, nextValue: string) {
-    setSubmitError(null)
+    setSubmitError(null);
     setFieldErrors((currentErrors) => ({
       ...currentErrors,
       [field]: undefined,
-    }))
+    }));
 
-    if (field === 'name') {
-      setName(nextValue)
+    if (field === "name") {
+      setName(nextValue);
     }
 
-    if (field === 'description') {
-      setDescriptionValue(nextValue)
+    if (field === "description") {
+      setDescriptionValue(nextValue);
     }
 
-    if (field === 'durationMinutes') {
-      setDurationMinutes(nextValue)
+    if (field === "durationMinutes") {
+      setDurationMinutes(nextValue);
     }
   }
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault()
+    event.preventDefault();
 
     const nextValues = {
       name,
       description: descriptionValue,
       durationMinutes,
-    }
-    const validationErrors = getValidationErrors(nextValues)
+    };
+    const validationErrors = getValidationErrors(nextValues);
 
     if (Object.keys(validationErrors).length > 0) {
-      setFieldErrors(validationErrors)
-      setSubmitError('Проверьте форму и исправьте ошибки')
-      return
+      setFieldErrors(validationErrors);
+      setSubmitError("Проверьте форму и исправьте ошибки");
+      return;
     }
 
-    setIsSubmitting(true)
-    setFieldErrors({})
-    setSubmitError(null)
+    setIsSubmitting(true);
+    setFieldErrors({});
+    setSubmitError(null);
 
     try {
       await onSubmit({
         name: name.trim(),
         description: descriptionValue.trim(),
         durationMinutes: Number(durationMinutes),
-      })
+      });
     } catch (error) {
       if (error instanceof ApiError && error.status === 422) {
-        const nextFieldErrors: EventTypeFieldErrors = {}
+        const nextFieldErrors: EventTypeFieldErrors = {};
 
         for (const validationError of error.errorResponse.errors ?? []) {
           if (isEventTypeField(validationError.field)) {
-            nextFieldErrors[validationError.field] = validationError.message
+            nextFieldErrors[validationError.field] = validationError.message;
           }
         }
 
-        setFieldErrors(nextFieldErrors)
-        setSubmitError(error.errorResponse.message)
-        return
+        setFieldErrors(nextFieldErrors);
+        setSubmitError(error.errorResponse.message);
+        return;
       }
 
       if (getErrorMessage) {
-        setSubmitError(getErrorMessage(error))
-        return
+        setSubmitError(getErrorMessage(error));
+        return;
       }
 
       if (error instanceof ApiError) {
-        setSubmitError(error.errorResponse.message)
-        return
+        setSubmitError(error.errorResponse.message);
+        return;
       }
 
-      setSubmitError(error instanceof Error ? error.message : 'Не удалось сохранить тип события')
+      setSubmitError(
+        error instanceof Error
+          ? error.message
+          : "Не удалось сохранить тип события",
+      );
     } finally {
-      setIsSubmitting(false)
+      setIsSubmitting(false);
     }
   }
 
@@ -190,14 +205,21 @@ export default function EventTypeForm({
               id="event-type-name"
               name="name"
               value={name}
-              onChange={(event) => handleFieldChange('name', event.target.value)}
+              onChange={(event) =>
+                handleFieldChange("name", event.target.value)
+              }
               aria-invalid={fieldErrors.name ? true : undefined}
-              aria-describedby={fieldErrors.name ? 'event-type-name-error' : undefined}
+              aria-describedby={
+                fieldErrors.name ? "event-type-name-error" : undefined
+              }
               placeholder="Например, Консультация"
               disabled={isSubmitting}
             />
             {fieldErrors.name ? (
-              <p id="event-type-name-error" className="text-sm text-destructive">
+              <p
+                id="event-type-name-error"
+                className="text-sm text-destructive"
+              >
                 {fieldErrors.name}
               </p>
             ) : null}
@@ -209,14 +231,23 @@ export default function EventTypeForm({
               id="event-type-description"
               name="description"
               value={descriptionValue}
-              onChange={(event) => handleFieldChange('description', event.target.value)}
+              onChange={(event) =>
+                handleFieldChange("description", event.target.value)
+              }
               aria-invalid={fieldErrors.description ? true : undefined}
-              aria-describedby={fieldErrors.description ? 'event-type-description-error' : undefined}
+              aria-describedby={
+                fieldErrors.description
+                  ? "event-type-description-error"
+                  : undefined
+              }
               placeholder="Коротко опишите, что обсудите на встрече"
               disabled={isSubmitting}
             />
             {fieldErrors.description ? (
-              <p id="event-type-description-error" className="text-sm text-destructive">
+              <p
+                id="event-type-description-error"
+                className="text-sm text-destructive"
+              >
                 {fieldErrors.description}
               </p>
             ) : null}
@@ -231,28 +262,42 @@ export default function EventTypeForm({
               min="1"
               step="1"
               value={durationMinutes}
-              onChange={(event) => handleFieldChange('durationMinutes', event.target.value)}
+              onChange={(event) =>
+                handleFieldChange("durationMinutes", event.target.value)
+              }
               aria-invalid={fieldErrors.durationMinutes ? true : undefined}
-              aria-describedby={fieldErrors.durationMinutes ? 'event-type-duration-error' : undefined}
+              aria-describedby={
+                fieldErrors.durationMinutes
+                  ? "event-type-duration-error"
+                  : undefined
+              }
               disabled={isSubmitting}
             />
             {fieldErrors.durationMinutes ? (
-              <p id="event-type-duration-error" className="text-sm text-destructive">
+              <p
+                id="event-type-duration-error"
+                className="text-sm text-destructive"
+              >
                 {fieldErrors.durationMinutes}
               </p>
             ) : null}
           </div>
 
           <div className="flex flex-col gap-3 sm:flex-row sm:justify-end">
-            <Button type="button" variant="outline" onClick={onCancel} disabled={isSubmitting}>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={onCancel}
+              disabled={isSubmitting}
+            >
               {cancelLabel}
             </Button>
             <Button type="submit" disabled={isSubmitting}>
-              {isSubmitting ? 'Сохранение...' : submitLabel}
+              {isSubmitting ? "Сохранение..." : submitLabel}
             </Button>
           </div>
         </form>
       </CardContent>
     </Card>
-  )
+  );
 }

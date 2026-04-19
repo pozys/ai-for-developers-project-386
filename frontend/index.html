@@ -7,20 +7,26 @@
     <title>frontend</title>
     <script>
       (() => {
-        const storageKey = 'app-theme'
+        const storageKey = "app-theme";
 
         try {
-          const storedTheme = localStorage.getItem(storageKey)
-          const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
-          const resolvedTheme = storedTheme === 'dark' || storedTheme === 'light' ? storedTheme : systemTheme
-          const rootElement = document.documentElement
+          const storedTheme = localStorage.getItem(storageKey);
+          const systemTheme = window.matchMedia("(prefers-color-scheme: dark)")
+            .matches
+            ? "dark"
+            : "light";
+          const resolvedTheme =
+            storedTheme === "dark" || storedTheme === "light"
+              ? storedTheme
+              : systemTheme;
+          const rootElement = document.documentElement;
 
-          rootElement.classList.toggle('dark', resolvedTheme === 'dark')
-          rootElement.style.colorScheme = resolvedTheme
+          rootElement.classList.toggle("dark", resolvedTheme === "dark");
+          rootElement.style.colorScheme = resolvedTheme;
         } catch {
-          document.documentElement.style.colorScheme = 'light'
+          document.documentElement.style.colorScheme = "light";
         }
-      })()
+      })();
     </script>
   </head>
   <body>

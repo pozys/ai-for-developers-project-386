@@ -1,26 +1,29 @@
-import type { ReactNode } from 'react'
-import { NavLink, Outlet } from 'react-router'
+import type { ReactNode } from "react";
+import { NavLink, Outlet } from "react-router";
 
-import { ThemeToggle } from '@/theme/ThemeToggle'
+import { ThemeToggle } from "@/theme/ThemeToggle";
 
 function getNavLinkClassName(isActive: boolean) {
   return [
-    'inline-flex items-center rounded-full px-3 py-2 text-sm font-medium transition-all',
-    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50',
+    "inline-flex items-center rounded-full px-3 py-2 text-sm font-medium transition-all",
+    "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50",
     isActive
-      ? 'bg-foreground text-background shadow-sm shadow-foreground/10'
-      : 'border border-border/80 bg-card/80 text-muted-foreground shadow-sm backdrop-blur hover:border-primary/30 hover:text-foreground',
-  ].join(' ')
+      ? "bg-foreground text-background shadow-sm shadow-foreground/10"
+      : "border border-border/80 bg-card/80 text-muted-foreground shadow-sm backdrop-blur hover:border-primary/30 hover:text-foreground",
+  ].join(" ");
 }
 
 interface LayoutProps {
-  children?: ReactNode
+  children?: ReactNode;
 }
 
 export default function Layout({ children }: LayoutProps) {
   return (
     <div className="relative min-h-dvh overflow-hidden bg-background">
-      <div aria-hidden="true" className="pointer-events-none absolute inset-0 -z-10">
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 -z-10"
+      >
         <div className="absolute left-1/2 top-0 h-80 w-80 -translate-x-1/2 rounded-full bg-primary/10 blur-3xl" />
         <div className="absolute left-[-4rem] top-32 h-72 w-72 rounded-full bg-amber-400/10 blur-3xl dark:bg-amber-300/10" />
         <div className="absolute right-[-5rem] top-48 h-72 w-72 rounded-full bg-sky-400/10 blur-3xl dark:bg-sky-500/10" />
@@ -36,11 +39,17 @@ export default function Layout({ children }: LayoutProps) {
             </div>
             <div className="leading-tight">
               <p className="font-heading text-lg">Встречалка</p>
-              <p className="text-xs text-muted-foreground">Запись на встречу без лишних шагов</p>
+              <p className="text-xs text-muted-foreground">
+                Запись на встречу без лишних шагов
+              </p>
             </div>
           </div>
           <div className="flex flex-wrap items-center justify-end gap-2">
-            <NavLink to="/" end className={({ isActive }) => getNavLinkClassName(isActive)}>
+            <NavLink
+              to="/"
+              end
+              className={({ isActive }) => getNavLinkClassName(isActive)}
+            >
               Главная
             </NavLink>
             <NavLink
@@ -57,5 +66,5 @@ export default function Layout({ children }: LayoutProps) {
         {children ?? <Outlet />}
       </main>
     </div>
-  )
+  );
 }

@@ -1,12 +1,12 @@
-import { useEffect, useState } from 'react'
-import { useNavigate } from 'react-router'
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router";
 
-import { getEventTypes } from '@/api/client'
-import type { EventType } from '@/types/api'
+import { getEventTypes } from "@/api/client";
+import type { EventType } from "@/types/api";
 
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -14,46 +14,50 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from '@/components/ui/card'
-import { Skeleton } from '@/components/ui/skeleton'
+} from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export default function EventTypesPage() {
-  const navigate = useNavigate()
-  const [eventTypes, setEventTypes] = useState<EventType[]>([])
-  const [isLoading, setIsLoading] = useState(true)
-  const [errorMessage, setErrorMessage] = useState<string | null>(null)
-  const [requestKey, setRequestKey] = useState(0)
+  const navigate = useNavigate();
+  const [eventTypes, setEventTypes] = useState<EventType[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [requestKey, setRequestKey] = useState(0);
 
   useEffect(() => {
-    let isMounted = true
+    let isMounted = true;
 
-    setErrorMessage(null)
-    setIsLoading(true)
+    setErrorMessage(null);
+    setIsLoading(true);
 
     async function loadEventTypes() {
       try {
-        const data = await getEventTypes()
+        const data = await getEventTypes();
 
         if (isMounted) {
-          setEventTypes(data)
+          setEventTypes(data);
         }
       } catch (error) {
         if (isMounted) {
-          setErrorMessage(error instanceof Error ? error.message : 'Не удалось загрузить типы событий')
+          setErrorMessage(
+            error instanceof Error
+              ? error.message
+              : "Не удалось загрузить типы событий",
+          );
         }
       } finally {
         if (isMounted) {
-          setIsLoading(false)
+          setIsLoading(false);
         }
       }
     }
 
-    void loadEventTypes()
+    void loadEventTypes();
 
     return () => {
-      isMounted = false
-    }
-  }, [requestKey])
+      isMounted = false;
+    };
+  }, [requestKey]);
 
   return (
     <div className="space-y-8" aria-busy={isLoading}>
@@ -71,8 +75,9 @@ export default function EventTypesPage() {
               Типы событий
             </h1>
             <p className="max-w-2xl text-pretty text-lg text-muted-foreground">
-              Выберите формат встречи, затем удобную дату и свободный слот в календаре. Вся запись
-              занимает несколько кликов и не требует регистрации.
+              Выберите формат встречи, затем удобную дату и свободный слот в
+              календаре. Вся запись занимает несколько кликов и не требует
+              регистрации.
             </p>
           </div>
         </div>
@@ -80,7 +85,9 @@ export default function EventTypesPage() {
         <Card className="border-border/70 bg-card/90">
           <CardHeader className="space-y-2">
             <CardTitle className="text-xl">Как это работает</CardTitle>
-            <CardDescription>Ориентир для гостей перед выбором конкретного формата.</CardDescription>
+            <CardDescription>
+              Ориентир для гостей перед выбором конкретного формата.
+            </CardDescription>
           </CardHeader>
           <CardContent className="space-y-3 text-sm text-muted-foreground">
             <div className="flex items-center justify-between gap-4">
@@ -105,7 +112,11 @@ export default function EventTypesPage() {
             <AlertTitle>Не удалось загрузить типы событий</AlertTitle>
             <AlertDescription>{errorMessage}</AlertDescription>
           </Alert>
-          <Button type="button" variant="outline" onClick={() => setRequestKey((value) => value + 1)}>
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => setRequestKey((value) => value + 1)}
+          >
             Повторить загрузку
           </Button>
         </div>
@@ -135,12 +146,18 @@ export default function EventTypesPage() {
       {!isLoading && !errorMessage && eventTypes.length === 0 ? (
         <Card className="border-border/70 bg-card/90">
           <CardHeader className="space-y-3">
-            <Badge variant="secondary" className="w-fit bg-primary/10 text-primary">
+            <Badge
+              variant="secondary"
+              className="w-fit bg-primary/10 text-primary"
+            >
               Пустой список
             </Badge>
-            <CardTitle className="text-2xl">Пока нет доступных слотов</CardTitle>
+            <CardTitle className="text-2xl">
+              Пока нет доступных слотов
+            </CardTitle>
             <CardDescription>
-              Когда владелец календаря добавит типы событий, они появятся на этой странице.
+              Когда владелец календаря добавит типы событий, они появятся на
+              этой странице.
             </CardDescription>
           </CardHeader>
         </Card>
@@ -149,15 +166,23 @@ export default function EventTypesPage() {
       {!isLoading && !errorMessage && eventTypes.length > 0 ? (
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
           {eventTypes.map((eventType) => (
-            <Card key={eventType.id} className="h-full transition-transform duration-200 hover:-translate-y-0.5">
+            <Card
+              key={eventType.id}
+              className="h-full transition-transform duration-200 hover:-translate-y-0.5"
+            >
               <CardHeader className="space-y-3">
                 <div className="flex items-start justify-between gap-3">
                   <CardTitle className="text-2xl">{eventType.name}</CardTitle>
-                  <Badge variant="secondary" className="bg-primary/10 text-primary">
+                  <Badge
+                    variant="secondary"
+                    className="bg-primary/10 text-primary"
+                  >
                     {eventType.durationMinutes} мин
                   </Badge>
                 </div>
-                <CardDescription className="text-pretty">{eventType.description}</CardDescription>
+                <CardDescription className="text-pretty">
+                  {eventType.description}
+                </CardDescription>
               </CardHeader>
               <CardFooter>
                 <Button
@@ -173,5 +198,5 @@ export default function EventTypesPage() {
         </div>
       ) : null}
     </div>
-  )
+  );
 }

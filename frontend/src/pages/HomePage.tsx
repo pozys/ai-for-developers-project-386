@@ -1,1 +1,1 @@
-export { default } from './EventTypesPage'
+export { default } from "./EventTypesPage";
