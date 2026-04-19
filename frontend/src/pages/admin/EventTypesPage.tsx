@@ -142,10 +142,6 @@ export default function AdminEventTypesPage() {
                 </div>
                 <CardDescription className="text-pretty">{eventType.description}</CardDescription>
               </CardHeader>
-              <CardContent className="space-y-2 text-sm text-muted-foreground">
-                <p>Идентификатор типа события: {eventType.id}</p>
-                <p>Используется в публичной странице и в форме создания бронирования.</p>
-              </CardContent>
               <CardFooter className="justify-end">
                 <Button
                   type="button"

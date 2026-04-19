@@ -159,10 +159,6 @@ export default function EventTypesPage() {
                 </div>
                 <CardDescription className="text-pretty">{eventType.description}</CardDescription>
               </CardHeader>
-              <CardContent className="space-y-2 text-sm text-muted-foreground">
-                <p>Доступно для бронирования в ближайшие 14 дней по рабочим дням.</p>
-                <p>Подходит для гостя, который хочет быстро выбрать формат встречи.</p>
-              </CardContent>
               <CardFooter>
                 <Button
                   type="button"
