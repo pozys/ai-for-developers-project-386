@@ -29,7 +29,7 @@
       "frontend/node_modules/.bin/prettier --write"
     ],
     "backend/**/*.php": [
-      "backend/vendor/bin/php-cs-fixer fix --config=backend/.php-cs-fixer.dist.php --path-mode=intersection --allow-risky=yes"
+      "bash scripts/backend-quality.sh fix-staged"
     ]
   }
 }

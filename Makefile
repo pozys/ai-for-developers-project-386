@@ -8,6 +8,8 @@
 	e2e e2e-ui e2e-report \
 	dev build
 
+BACKEND_QUALITY_SCRIPT := bash scripts/backend-quality.sh
+
 # ─── Backend ────────────────────────────────────────────────────────────────
 
 install:
@@ -27,7 +29,7 @@ lint:
 	$(MAKE) lint-frontend
 
 lint-backend:
-	cd backend && composer lint
+	$(BACKEND_QUALITY_SCRIPT) lint
 
 lint-frontend:
 	cd frontend && npm run lint:ci
@@ -37,7 +39,7 @@ format:
 	$(MAKE) format-frontend
 
 format-backend:
-	cd backend && composer cs:fix
+	$(BACKEND_QUALITY_SCRIPT) format
 
 format-frontend:
 	cd frontend && npm run format
@@ -46,7 +48,7 @@ test:
 	$(MAKE) test-backend
 
 test-backend:
-	cd backend && composer test
+	$(BACKEND_QUALITY_SCRIPT) test
 
 test-frontend:
 	cd frontend && npm run test:unit
@@ -55,7 +57,7 @@ test-e2e:
 	cd frontend && npm run test:e2e
 
 test-coverage:
-	cd backend && composer coverage
+	$(BACKEND_QUALITY_SCRIPT) coverage
 
 # ─── Frontend ───────────────────────────────────────────────────────────────
 
