@@ -3,6 +3,7 @@
 namespace App\DataFixtures;
 
 use App\Entity\EventType;
+use App\Entity\Owner;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Bundle\FixturesBundle\FixtureGroupInterface;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
@@ -12,7 +13,10 @@ class EventTypeFixture extends Fixture implements DependentFixtureInterface, Fix
 {
     public function load(ObjectManager $manager): void
     {
-        $owner = $manager->getReference(\App\Entity\Owner::class, OwnerFixture::OWNER_ID);
+        $owner = $manager->getRepository(Owner::class)->find(OwnerFixture::OWNER_ID);
+        if (!$owner instanceof Owner) {
+            throw new \RuntimeException('Owner fixture was not loaded.');
+        }
 
         $consultations = [
             ['22222222-2222-4222-8222-222222222221', 'Быстрая консультация', 'Короткая встреча для обсуждения конкретного вопроса.', 30],
