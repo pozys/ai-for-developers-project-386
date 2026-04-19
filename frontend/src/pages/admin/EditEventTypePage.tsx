@@ -1,112 +1,122 @@
-import { useEffect, useState } from 'react'
-import { useNavigate, useParams } from 'react-router'
+import { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router";
 
-import { getAdminEventTypes, updateEventType } from '@/api/client'
-import { ApiError } from '@/api/errors'
-import type { CreateEventTypeRequest, EventType, UpdateEventTypeRequest } from '@/types/api'
+import { getAdminEventTypes, updateEventType } from "@/api/client";
+import { ApiError } from "@/api/errors";
+import type {
+  CreateEventTypeRequest,
+  EventType,
+  UpdateEventTypeRequest,
+} from "@/types/api";
 
-import EventTypeForm from '@/components/admin/EventTypeForm'
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
-import { Button } from '@/components/ui/button'
-import { Skeleton } from '@/components/ui/skeleton'
+import EventTypeForm from "@/components/admin/EventTypeForm";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 
 function buildUpdatePayload(
   initialValues: EventType,
   nextValues: CreateEventTypeRequest,
 ): UpdateEventTypeRequest {
-  const payload: UpdateEventTypeRequest = {}
+  const payload: UpdateEventTypeRequest = {};
 
   if (initialValues.name !== nextValues.name) {
-    payload.name = nextValues.name
+    payload.name = nextValues.name;
   }
 
   if (initialValues.description !== nextValues.description) {
-    payload.description = nextValues.description
+    payload.description = nextValues.description;
   }
 
   if (initialValues.durationMinutes !== nextValues.durationMinutes) {
-    payload.durationMinutes = nextValues.durationMinutes
+    payload.durationMinutes = nextValues.durationMinutes;
   }
 
-  return payload
+  return payload;
 }
 
 export default function EditEventTypePage() {
-  const navigate = useNavigate()
-  const { id = '' } = useParams()
-  const [eventType, setEventType] = useState<EventType | null>(null)
-  const [isLoading, setIsLoading] = useState(true)
-  const [loadError, setLoadError] = useState<string | null>(null)
-  const [requestKey, setRequestKey] = useState(0)
+  const navigate = useNavigate();
+  const { id = "" } = useParams();
+  const [eventType, setEventType] = useState<EventType | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
+  const [requestKey, setRequestKey] = useState(0);
 
   useEffect(() => {
-    let isMounted = true
+    let isMounted = true;
 
-    setEventType(null)
-    setLoadError(null)
-    setIsLoading(true)
+    setEventType(null);
+    setLoadError(null);
+    setIsLoading(true);
 
     async function loadEventType() {
       try {
-        const eventTypes = await getAdminEventTypes()
-        const currentEventType = eventTypes.find((item) => item.id === id)
+        const eventTypes = await getAdminEventTypes();
+        const currentEventType = eventTypes.find((item) => item.id === id);
 
         if (!isMounted) {
-          return
+          return;
         }
 
         if (!currentEventType) {
-          setLoadError('Тип события не найден')
-          return
+          setLoadError("Тип события не найден");
+          return;
         }
 
-        setEventType(currentEventType)
+        setEventType(currentEventType);
       } catch (error) {
         if (!isMounted) {
-          return
+          return;
         }
 
-        setLoadError(error instanceof Error ? error.message : 'Не удалось загрузить тип события')
+        setLoadError(
+          error instanceof Error
+            ? error.message
+            : "Не удалось загрузить тип события",
+        );
       } finally {
         if (isMounted) {
-          setIsLoading(false)
+          setIsLoading(false);
         }
       }
     }
 
-    void loadEventType()
+    void loadEventType();
 
     return () => {
-      isMounted = false
-    }
-  }, [id, requestKey])
+      isMounted = false;
+    };
+  }, [id, requestKey]);
 
   async function handleSubmit(values: CreateEventTypeRequest) {
     if (!eventType) {
-      return
+      return;
     }
 
-    const payload = buildUpdatePayload(eventType, values)
+    const payload = buildUpdatePayload(eventType, values);
 
     if (Object.keys(payload).length === 0) {
-      navigate('/admin/event-types')
-      return
+      navigate("/admin/event-types");
+      return;
     }
 
-    await updateEventType(eventType.id, payload)
-    navigate('/admin/event-types')
+    await updateEventType(eventType.id, payload);
+    navigate("/admin/event-types");
   }
 
   function getSubmitErrorMessage(error: unknown) {
     if (error instanceof ApiError && error.status === 404) {
-      return 'Тип события не найден или уже был удалён'
+      return "Тип события не найден или уже был удалён";
     }
 
     if (error instanceof ApiError) {
-      return error.errorResponse.message
+      return error.errorResponse.message;
     }
 
-    return error instanceof Error ? error.message : 'Не удалось сохранить изменения'
+    return error instanceof Error
+      ? error.message
+      : "Не удалось сохранить изменения";
   }
 
   if (isLoading) {
@@ -115,7 +125,7 @@ export default function EditEventTypePage() {
         <Skeleton className="h-8 w-56" />
         <Skeleton className="h-[420px] w-full rounded-xl" />
       </div>
-    )
+    );
   }
 
   if (loadError || !eventType) {
@@ -123,14 +133,16 @@ export default function EditEventTypePage() {
       <div className="space-y-4">
         <Alert variant="destructive">
           <AlertTitle>Не удалось открыть тип события</AlertTitle>
-          <AlertDescription>{loadError ?? 'Тип события не найден'}</AlertDescription>
+          <AlertDescription>
+            {loadError ?? "Тип события не найден"}
+          </AlertDescription>
         </Alert>
         <div className="flex flex-col gap-3 sm:flex-row">
           <Button
             type="button"
             variant="outline"
             className="sm:flex-1"
-            onClick={() => navigate('/admin/event-types')}
+            onClick={() => navigate("/admin/event-types")}
           >
             К списку типов событий
           </Button>
@@ -143,7 +155,7 @@ export default function EditEventTypePage() {
           </Button>
         </div>
       </div>
-    )
+    );
   }
 
   return (
@@ -157,9 +169,9 @@ export default function EditEventTypePage() {
         durationMinutes: eventType.durationMinutes,
       }}
       onSubmit={handleSubmit}
-      onCancel={() => navigate('/admin/event-types')}
+      onCancel={() => navigate("/admin/event-types")}
       cancelLabel="Назад к списку"
       getErrorMessage={getSubmitErrorMessage}
     />
-  )
+  );
 }

@@ -1,81 +1,88 @@
-import { render, screen, waitFor } from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
-import { MemoryRouter, Route, Routes } from 'react-router'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { render, screen, waitFor } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
+import { MemoryRouter, Route, Routes } from "react-router";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import { createEventType } from '@/api/client'
-import { ApiError } from '@/api/errors'
+import { createEventType } from "@/api/client";
+import { ApiError } from "@/api/errors";
 
-import CreateEventTypePage from './CreateEventTypePage'
+import CreateEventTypePage from "./CreateEventTypePage";
 
-vi.mock('@/api/client', () => ({
+vi.mock("@/api/client", () => ({
   createEventType: vi.fn(),
-}))
+}));
 
 function renderCreateEventTypePage() {
   return render(
-    <MemoryRouter initialEntries={['/admin/event-types/new']}>
+    <MemoryRouter initialEntries={["/admin/event-types/new"]}>
       <Routes>
-        <Route path="/admin/event-types/new" element={<CreateEventTypePage />} />
+        <Route
+          path="/admin/event-types/new"
+          element={<CreateEventTypePage />}
+        />
         <Route path="/admin/event-types" element={<div>Список типов</div>} />
       </Routes>
     </MemoryRouter>,
-  )
+  );
 }
 
-describe('CreateEventTypePage', () => {
+describe("CreateEventTypePage", () => {
   beforeEach(() => {
-    vi.clearAllMocks()
-  })
+    vi.clearAllMocks();
+  });
 
-  it('создает тип события и возвращает на список', async () => {
-    const user = userEvent.setup()
+  it("создает тип события и возвращает на список", async () => {
+    const user = userEvent.setup();
 
     vi.mocked(createEventType).mockResolvedValue({
-      id: 'evt-type-2',
-      ownerId: 'owner-1',
-      name: 'Демо',
-      description: 'Короткий созвон',
+      id: "evt-type-2",
+      ownerId: "owner-1",
+      name: "Демо",
+      description: "Короткий созвон",
       durationMinutes: 30,
-    })
+    });
 
-    renderCreateEventTypePage()
+    renderCreateEventTypePage();
 
-    await user.type(screen.getByLabelText('Название'), 'Демо')
-    await user.type(screen.getByLabelText('Описание'), 'Короткий созвон')
-    await user.clear(screen.getByLabelText('Длительность, минут'))
-    await user.type(screen.getByLabelText('Длительность, минут'), '30')
-    await user.click(screen.getByRole('button', { name: 'Создать тип события' }))
+    await user.type(screen.getByLabelText("Название"), "Демо");
+    await user.type(screen.getByLabelText("Описание"), "Короткий созвон");
+    await user.clear(screen.getByLabelText("Длительность, минут"));
+    await user.type(screen.getByLabelText("Длительность, минут"), "30");
+    await user.click(
+      screen.getByRole("button", { name: "Создать тип события" }),
+    );
 
     await waitFor(() => {
       expect(createEventType).toHaveBeenCalledWith({
-        name: 'Демо',
-        description: 'Короткий созвон',
+        name: "Демо",
+        description: "Короткий созвон",
         durationMinutes: 30,
-      })
-    })
+      });
+    });
 
-    expect(await screen.findByText('Список типов')).toBeInTheDocument()
-  })
+    expect(await screen.findByText("Список типов")).toBeInTheDocument();
+  });
 
-  it('показывает field-level ошибки сервера при 422', async () => {
-    const user = userEvent.setup()
+  it("показывает field-level ошибки сервера при 422", async () => {
+    const user = userEvent.setup();
 
     vi.mocked(createEventType).mockRejectedValue(
       new ApiError(422, {
-        message: 'Ошибка валидации',
-        errors: [{ field: 'name', message: 'Название уже занято' }],
+        message: "Ошибка валидации",
+        errors: [{ field: "name", message: "Название уже занято" }],
       }),
-    )
+    );
 
-    renderCreateEventTypePage()
+    renderCreateEventTypePage();
 
-    await user.type(screen.getByLabelText('Название'), 'Демо')
-    await user.type(screen.getByLabelText('Описание'), 'Короткий созвон')
-    await user.clear(screen.getByLabelText('Длительность, минут'))
-    await user.type(screen.getByLabelText('Длительность, минут'), '30')
-    await user.click(screen.getByRole('button', { name: 'Создать тип события' }))
+    await user.type(screen.getByLabelText("Название"), "Демо");
+    await user.type(screen.getByLabelText("Описание"), "Короткий созвон");
+    await user.clear(screen.getByLabelText("Длительность, минут"));
+    await user.type(screen.getByLabelText("Длительность, минут"), "30");
+    await user.click(
+      screen.getByRole("button", { name: "Создать тип события" }),
+    );
 
-    expect(await screen.findByText('Название уже занято')).toBeInTheDocument()
-  })
-})
+    expect(await screen.findByText("Название уже занято")).toBeInTheDocument();
+  });
+});

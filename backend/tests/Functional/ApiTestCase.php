@@ -40,7 +40,6 @@ abstract class ApiTestCase extends WebTestCase
 
     protected function tearDown(): void
     {
-        unset($this->client, $this->entityManager, $this->referenceNowMoscow);
         self::ensureKernelShutdown();
     }
 
@@ -52,6 +51,23 @@ abstract class ApiTestCase extends WebTestCase
         $decoded = json_decode($response->getContent() ?: '[]', true);
 
         return is_array($decoded) ? $decoded : [];
+    }
+
+    /**
+     * @return list<array<string, mixed>>
+     */
+    protected function jsonListResponse(Response $response): array
+    {
+        $decoded = $this->jsonResponse($response);
+        $items = [];
+
+        foreach ($decoded as $item) {
+            if (is_array($item)) {
+                $items[] = $item;
+            }
+        }
+
+        return $items;
     }
 
     /**

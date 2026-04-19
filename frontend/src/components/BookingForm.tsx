@@ -1,66 +1,82 @@
-import { useState } from 'react'
-import type { FormEvent } from 'react'
+import { useState } from "react";
+import type { FormEvent } from "react";
 
-import { createBooking } from '@/api/client'
-import { ApiError } from '@/api/errors'
-import type { Booking, EventType, TimeSlot } from '@/types/api'
+import { createBooking } from "@/api/client";
+import { ApiError } from "@/api/errors";
+import type { Booking, EventType, TimeSlot } from "@/types/api";
 
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Textarea } from '@/components/ui/textarea'
-import { formatDateLabel, formatSlotRange } from '@/lib/date'
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { formatDateLabel, formatSlotRange } from "@/lib/date";
 
 interface BookingFormProps {
-  eventType: EventType
-  slot: TimeSlot
-  onBack: () => void
-  onSuccess: (booking: Booking) => void
+  eventType: EventType;
+  slot: TimeSlot;
+  onBack: () => void;
+  onSuccess: (booking: Booking) => void;
 }
 
-type FieldErrors = Partial<Record<'guestName' | 'guestEmail' | 'comment', string>>
+type FieldErrors = Partial<
+  Record<"guestName" | "guestEmail" | "comment", string>
+>;
 
-const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-function getValidationErrors(guestName: string, guestEmail: string): FieldErrors {
-  const errors: FieldErrors = {}
+function getValidationErrors(
+  guestName: string,
+  guestEmail: string,
+): FieldErrors {
+  const errors: FieldErrors = {};
 
   if (!guestName.trim()) {
-    errors.guestName = 'Введите имя'
+    errors.guestName = "Введите имя";
   }
 
   if (!EMAIL_PATTERN.test(guestEmail.trim())) {
-    errors.guestEmail = 'Введите корректный email'
+    errors.guestEmail = "Введите корректный email";
   }
 
-  return errors
+  return errors;
 }
 
-export default function BookingForm({ eventType, slot, onBack, onSuccess }: BookingFormProps) {
-  const [guestName, setGuestName] = useState('')
-  const [guestEmail, setGuestEmail] = useState('')
-  const [comment, setComment] = useState('')
-  const [fieldErrors, setFieldErrors] = useState<FieldErrors>({})
-  const [submitError, setSubmitError] = useState<string | null>(null)
-  const [isSubmitting, setIsSubmitting] = useState(false)
+export default function BookingForm({
+  eventType,
+  slot,
+  onBack,
+  onSuccess,
+}: BookingFormProps) {
+  const [guestName, setGuestName] = useState("");
+  const [guestEmail, setGuestEmail] = useState("");
+  const [comment, setComment] = useState("");
+  const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
+  const [submitError, setSubmitError] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault()
+    event.preventDefault();
 
-    const clientErrors = getValidationErrors(guestName, guestEmail)
+    const clientErrors = getValidationErrors(guestName, guestEmail);
 
     if (Object.keys(clientErrors).length > 0) {
-      setFieldErrors(clientErrors)
-      setSubmitError(null)
-      return
+      setFieldErrors(clientErrors);
+      setSubmitError(null);
+      return;
     }
 
-    setIsSubmitting(true)
-    setFieldErrors({})
-    setSubmitError(null)
+    setIsSubmitting(true);
+    setFieldErrors({});
+    setSubmitError(null);
 
     try {
       const booking = await createBooking({
@@ -69,32 +85,40 @@ export default function BookingForm({ eventType, slot, onBack, onSuccess }: Book
         comment: comment.trim() || undefined,
         eventTypeId: eventType.id,
         startTime: slot.startTime,
-      })
+      });
 
-      onSuccess(booking)
+      onSuccess(booking);
     } catch (error) {
       if (error instanceof ApiError) {
         if (error.status === 409) {
-          setSubmitError('Это время уже забронировано')
+          setSubmitError("Это время уже забронировано");
         } else if (error.status === 422 && error.errorResponse.errors) {
-          const nextFieldErrors = error.errorResponse.errors.reduce<FieldErrors>((accumulator, item) => {
-            if (item.field === 'guestName' || item.field === 'guestEmail' || item.field === 'comment') {
-              accumulator[item.field] = item.message
-            }
+          const nextFieldErrors =
+            error.errorResponse.errors.reduce<FieldErrors>(
+              (accumulator, item) => {
+                if (
+                  item.field === "guestName" ||
+                  item.field === "guestEmail" ||
+                  item.field === "comment"
+                ) {
+                  accumulator[item.field] = item.message;
+                }
 
-            return accumulator
-          }, {})
+                return accumulator;
+              },
+              {},
+            );
 
-          setFieldErrors(nextFieldErrors)
-          setSubmitError(error.errorResponse.message)
+          setFieldErrors(nextFieldErrors);
+          setSubmitError(error.errorResponse.message);
         } else {
-          setSubmitError(error.errorResponse.message)
+          setSubmitError(error.errorResponse.message);
         }
       } else {
-        setSubmitError('Не удалось отправить бронирование')
+        setSubmitError("Не удалось отправить бронирование");
       }
     } finally {
-      setIsSubmitting(false)
+      setIsSubmitting(false);
     }
   }
 
@@ -102,7 +126,7 @@ export default function BookingForm({ eventType, slot, onBack, onSuccess }: Book
     setFieldErrors((currentErrors) => ({
       ...currentErrors,
       [fieldName]: undefined,
-    }))
+    }));
   }
 
   return (
@@ -116,7 +140,7 @@ export default function BookingForm({ eventType, slot, onBack, onSuccess }: Book
         </div>
         <CardTitle className="text-2xl">Данные для бронирования</CardTitle>
         <CardDescription>
-          {eventType.name} · {formatDateLabel(slot.startTime.slice(0, 10))} ·{' '}
+          {eventType.name} · {formatDateLabel(slot.startTime.slice(0, 10))} ·{" "}
           {formatSlotRange(slot.startTime, slot.endTime)}
         </CardDescription>
       </CardHeader>
@@ -138,10 +162,12 @@ export default function BookingForm({ eventType, slot, onBack, onSuccess }: Book
                 value={guestName}
                 required
                 aria-invalid={fieldErrors.guestName ? true : undefined}
-                aria-describedby={fieldErrors.guestName ? 'guestName-error' : undefined}
+                aria-describedby={
+                  fieldErrors.guestName ? "guestName-error" : undefined
+                }
                 onChange={(event) => {
-                  setGuestName(event.target.value)
-                  clearFieldError('guestName')
+                  setGuestName(event.target.value);
+                  clearFieldError("guestName");
                 }}
               />
               {fieldErrors.guestName ? (
@@ -161,10 +187,12 @@ export default function BookingForm({ eventType, slot, onBack, onSuccess }: Book
                 value={guestEmail}
                 required
                 aria-invalid={fieldErrors.guestEmail ? true : undefined}
-                aria-describedby={fieldErrors.guestEmail ? 'guestEmail-error' : undefined}
+                aria-describedby={
+                  fieldErrors.guestEmail ? "guestEmail-error" : undefined
+                }
                 onChange={(event) => {
-                  setGuestEmail(event.target.value)
-                  clearFieldError('guestEmail')
+                  setGuestEmail(event.target.value);
+                  clearFieldError("guestEmail");
                 }}
               />
               {fieldErrors.guestEmail ? (
@@ -183,10 +211,12 @@ export default function BookingForm({ eventType, slot, onBack, onSuccess }: Book
               value={comment}
               placeholder="Если есть детали, напишите их здесь"
               aria-invalid={fieldErrors.comment ? true : undefined}
-              aria-describedby={fieldErrors.comment ? 'comment-error' : undefined}
+              aria-describedby={
+                fieldErrors.comment ? "comment-error" : undefined
+              }
               onChange={(event) => {
-                setComment(event.target.value)
-                clearFieldError('comment')
+                setComment(event.target.value);
+                clearFieldError("comment");
               }}
             />
             {fieldErrors.comment ? (
@@ -197,15 +227,24 @@ export default function BookingForm({ eventType, slot, onBack, onSuccess }: Book
           </div>
 
           <div className="flex flex-col gap-3 sm:flex-row">
-            <Button type="submit" className="h-11 sm:flex-1" disabled={isSubmitting}>
-              {isSubmitting ? 'Сохраняем...' : 'Подтвердить запись'}
+            <Button
+              type="submit"
+              className="h-11 sm:flex-1"
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? "Сохраняем..." : "Подтвердить запись"}
             </Button>
-            <Button type="button" variant="outline" className="h-11 sm:flex-1" onClick={onBack}>
+            <Button
+              type="button"
+              variant="outline"
+              className="h-11 sm:flex-1"
+              onClick={onBack}
+            >
               Выбрать другой слот
             </Button>
           </div>
         </form>
       </CardContent>
     </Card>
-  )
+  );
 }

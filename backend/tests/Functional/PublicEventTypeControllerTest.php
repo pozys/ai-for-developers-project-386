@@ -20,7 +20,7 @@ class PublicEventTypeControllerTest extends ApiTestCase
         self::assertSame(Response::HTTP_OK, $response->getStatusCode());
         self::assertStringStartsWith('application/json', (string) $response->headers->get('Content-Type'));
 
-        $data = $this->jsonResponse($response);
+        $data = $this->jsonListResponse($response);
         self::assertCount(2, $data);
         self::assertSame(['Alpha', 'Beta'], array_column($data, 'name'));
         self::assertContains($first->getId(), array_column($data, 'id'));
@@ -36,7 +36,7 @@ class PublicEventTypeControllerTest extends ApiTestCase
 
         self::assertSame(Response::HTTP_OK, $response->getStatusCode());
 
-        $slots = $this->jsonResponse($response);
+        $slots = $this->jsonListResponse($response);
         self::assertCount(16, $slots);
         self::assertSame($this->moscowDateToUtcAtom(9, 0, $date), $slots[0]['startTime']);
         self::assertSame($this->moscowDateToUtcAtom(17, 0, $date), $slots[15]['endTime']);
@@ -59,7 +59,7 @@ class PublicEventTypeControllerTest extends ApiTestCase
 
         self::assertSame(Response::HTTP_OK, $response->getStatusCode());
 
-        $slots = $this->jsonResponse($response);
+        $slots = $this->jsonListResponse($response);
         self::assertFalse($slots[0]['available']);
         self::assertTrue($slots[1]['available']);
     }
@@ -72,7 +72,7 @@ class PublicEventTypeControllerTest extends ApiTestCase
 
         self::assertSame(Response::HTTP_OK, $response->getStatusCode());
 
-        $slots = $this->jsonResponse($response);
+        $slots = $this->jsonListResponse($response);
         self::assertCount(16, $slots);
 
         $expectedDate = $this->nextWeekday($this->todayMoscow())->format('Y-m-d');
@@ -109,7 +109,7 @@ class PublicEventTypeControllerTest extends ApiTestCase
         $response = $this->requestJson('GET', '/api/event-types/'.$eventType->getId().'/slots?date='.$date);
 
         self::assertSame(Response::HTTP_OK, $response->getStatusCode());
-        self::assertCount(8, $this->jsonResponse($response));
+        self::assertCount(8, $this->jsonListResponse($response));
     }
 
     public function testListSlotsEventTypeNotFound(): void
