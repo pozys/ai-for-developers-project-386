@@ -13,7 +13,23 @@
   "devDependencies": {
     "@playwright/test": "^1.59.1",
     "@types/node": "^25.6.0",
+    "husky": "^9.1.7",
+    "lint-staged": "^16.2.6",
     "shadcn": "^4.2.0"
   },
-  "scripts": {}
+  "scripts": {
+    "prepare": "husky"
+  },
+  "lint-staged": {
+    "frontend/**/*.{js,jsx,ts,tsx}": [
+      "frontend/node_modules/.bin/eslint --config frontend/eslint.config.js --fix --max-warnings=0",
+      "frontend/node_modules/.bin/prettier --write"
+    ],
+    "frontend/**/*.{css,scss,json,md,yaml,yml}": [
+      "frontend/node_modules/.bin/prettier --write"
+    ],
+    "backend/**/*.php": [
+      "backend/vendor/bin/php-cs-fixer fix --config=backend/.php-cs-fixer.dist.php --path-mode=intersection --allow-risky=yes"
+    ]
+  }
 }
